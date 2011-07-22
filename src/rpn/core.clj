@@ -1,37 +1,42 @@
-(ns rpn.core)
+(ns rpn.core
+  (:use [rpn.stack-ops :only [stack-op? process-stackop]]
+        [rpn.operators :only [operator? process-op]]
+        [rpn.stack :only [pushf]])
+  (:use [clojure.string :only [split]])
+  (:gen-class))
 
-(def main-stack (ref ()))
+(def *prompt* "cljrpn> ")
 
-(defn pushf
-  ([f] (dosync
-         (alter main-stack conj f)))
-  ([f & others] (let [args (cons f others)]
-                  (doseq [a args]
-                    (pushf a)))))
+(defn print-prompt []
+  (print *prompt*)
+  (flush))
 
-   
-(defn stacked? [n]
-  (>= (count @main-stack) n))
+(defn is-number? [tok]
+  (re-matches #"(\d+\.?\d*)|(\d*\.?\d+)" tok))
 
-(defn popf
-  ([] (dosync
-    (let [popped (first @main-stack)]
-         (alter main-stack pop)
-         popped)))
-  ([n] (when (stacked? n)
-    (loop [n n
-           acc []]
-      (if (= n 0)
-        acc
-        (recur (dec n) (conj acc (popf))))))))
+(defn process-token [tok]
+  (cond
+    (is-number? tok) (pushf (Float/parseFloat tok))
+    (operator? tok) (process-op tok)
+    (stack-op? tok) (process-stackop tok)
+    true (println (str "FALLTHROUGH: " tok))))
+
+(defn process-line [line]
+  (let [tokens (split line #"\s+")]
+    (doseq [tok tokens]
+      (process-token tok))))
 
 
-
-(defn apply-op [op n]
-  (dosync
-    (if-let [args (popf n)]
-      (pushf (apply op args)))))
-
+(defn main-loop [options]
+  (print-prompt)
+  (loop [line (read-line)]
+    (if (nil? line)
+      0
+      (do
+        (process-line line)
+        (print-prompt)
+        (recur (read-line)))))
+  (println "Exiting..."))
 
 (defn -main [& args]
-  (println "Hello rpn"))
+  (main-loop {}))
