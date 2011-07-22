@@ -1,22 +1,23 @@
-(ns rpn.stack-ops
+(ns rpn.commands
   (:use [rpn.stack]))
 
 (defn stack-pop []
-  (if (stacked? 1)
-    (println (popf))
-    (println "The stack is empty...")))
+  (let [val (popf)]
+    (if val
+      (println val)
+      (println "The stack is empty..."))))
 
 (defn stack-show []
-  (println "TOP> " @main-stack " <BOTTOM")) 
+  (println "TOP> " @*main-stack* " <BOTTOM")) 
 
-(def *stack-ops*
+(def *cmds*
   {
    :. stack-pop
    :.s stack-show})
 
-(defn stack-op? [o]
-  (contains? *stack-ops* (keyword o)))
+(defn cmd? [o]
+  (contains? *cmds* (keyword o)))
 
-(defn process-stackop [o]
-  ((*stack-ops* (keyword o))))
+(defn process-cmd [o]
+  ((*cmds* (keyword o))))
 

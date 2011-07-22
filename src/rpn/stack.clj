@@ -1,33 +1,24 @@
 (ns rpn.stack)
 
-(def main-stack (ref ()))
+(def *main-stack* (ref ()))
 
 (defn pushf
   ([f] (dosync
-         (alter main-stack conj f)))
+         (alter *main-stack* conj f)))
   ([f & others] (let [args (cons f others)]
                   (doseq [a args]
                     (pushf a)))))
 
-   
-(defn stacked? [n]
-  (>= (count @main-stack) n))
-
 (defn popf
-  ([] (dosync
-    (let [popped (first @main-stack)]
-         (alter main-stack pop)
-         popped)))
-  ([n] (when (stacked? n)
-    (loop [n n
-           acc []]
-      (if (= n 0)
-        acc
-        (recur (dec n) (conj acc (popf))))))))
-
-
+  ([] (if-let [p (popf 1)]
+        (first p)))
+  ([n] (let [popped (take n @*main-stack*)]
+         (if (= (count popped) n)
+           (dosync
+             (alter *main-stack* (partial drop n))
+             popped)))))
 
 (defn apply-op [op n]
   (dosync
-    (if-let [args (popf n)]
+    (if-let [args (reverse (popf n))]
       (pushf (apply op args)))))

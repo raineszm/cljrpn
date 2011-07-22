@@ -1,5 +1,5 @@
 (ns rpn.core
-  (:use [rpn.stack-ops :only [stack-op? process-stackop]]
+  (:use [rpn.commands :only [cmd? process-cmd]]
         [rpn.operators :only [operator? process-op]]
         [rpn.stack :only [pushf]])
   (:use [clojure.string :only [split]])
@@ -11,14 +11,17 @@
   (print *prompt*)
   (flush))
 
-(defn is-number? [tok]
+(defn num? [tok]
   (re-matches #"(\d+\.?\d*)|(\d*\.?\d+)" tok))
+
+(defn process-num [tok]
+  (pushf (Float/parseFloat tok)))
 
 (defn process-token [tok]
   (cond
-    (is-number? tok) (pushf (Float/parseFloat tok))
+    (num? tok) (process-num tok)
     (operator? tok) (process-op tok)
-    (stack-op? tok) (process-stackop tok)
+    (cmd? tok) (process-cmd tok)
     true (println (str "FALLTHROUGH: " tok))))
 
 (defn process-line [line]
