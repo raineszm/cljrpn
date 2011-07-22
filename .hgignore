@@ -1,0 +1,10 @@
+syntax: glob
+
+.gitignore
+pom.xml
+*jar
+lib/*
+classes/*
+.lein-failures
+.lein-deps-sum
+*.swp
