@@ -1,5 +1,6 @@
 (ns rpn.operators
   (:use [rpn.stack :only [apply-op]])
+  (:use [clojure.string :only [join]])
   (:require [clojure.contrib.math :as math]))
 
 (defn- get-arity [op]
@@ -27,14 +28,30 @@
   (apply hash-map
          (mapcat build-op ops)))
 
+(defn java-math-help [name arity]
+  (let [args (map #(str "x" %) (range arity))]
+    [(join " " args) (str name "(" (join ", " args) ")")]))
+
+;TODO:This still needs work
+(defmacro java-math [name arity & aliases]
+  (let [strname (str name)
+        aliases (conj (vec aliases) strname)]
+    `[~aliases #(. Math ~name %)
+      ~(java-math-help strname arity) ~arity]))
+
 
 (def *operators*
   (construct-ops
     [:+ + ["x y" "x + y"]]
     [:- - ["x y" "x - y"] 2]
     [:* * ["x y" "x * y"]]
+    ["/" / ["x y" "x / y"]]
     [:neg #(- %) ["x" "-x"] 1]
-    [["^" "**"] math/expt ["x y" "x**y"] 2]))
+    [["^" "**"] math/expt ["x y" "x**y"] 2]
+    (java-math sqrt 1 "v")
+    (java-math sin 1 "s")
+    (java-math cos 1 "c")
+    (java-math tan 1 "t")))
                 
 (defn operator? [o]
   (contains? *operators* (keyword o)))
