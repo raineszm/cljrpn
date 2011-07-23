@@ -25,11 +25,15 @@
     (print "Basic commands: ")
     (apply println (prep-keys (keys *cmds*)))))
 
+(defn quit []
+  (System/exit 0))
+
 (def *cmds*
   {
    :. stack-pop
    :.s stack-show
-   :? help})
+   :? help
+   :quit quit})
 
 (defn cmd? [o]
   (contains? *cmds* (keyword o)))
