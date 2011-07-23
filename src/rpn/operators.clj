@@ -8,12 +8,15 @@
 
 (defn build-op
   ([kwargs op help & arity]
-   (let [arity (or (first arity) (get-arity op))]
-     (if (vector? kwargs)
-       (mapcat #(build-op % op help arity) kwargs)
-       (list (keyword kwargs) { :op op,
-                               :help help,
-                               :arity arity}))))
+   (let [arity (or (first arity) (get-arity op))
+         kwargs (if (vector? kwargs) kwargs (vector kwargs))]
+     (mapcat #(build-op [% op help arity] kwargs) kwargs)))
+  ([[kw op help arity] aliases]
+   (list (keyword kw) { :op op,
+                       :help (apply effect help),
+                       :arity arity
+                       :cmds aliases}))
+
   ([args]
    (apply build-op args)))
 
@@ -26,11 +29,11 @@
 
 (def *operators*
   (construct-ops
-    [:+ + (effect "x y" "x + y")]
-    [:- - (effect "x y" "x - y") 2]
-    [:* * (effect "x y" "x * y")]
-    [:neg #(- %) (effect "x" "-x") 1]
-    [["^" "**"] math/expt (effect "x y" "x**y") 2]))
+    [:+ + ["x y" "x + y"]]
+    [:- - ["x y" "x - y"] 2]
+    [:* * ["x y" "x * y"]]
+    [:neg #(- %) ["x" "-x"] 1]
+    [["^" "**"] math/expt ["x y" "x**y"] 2]))
                 
 (defn operator? [o]
   (contains? *operators* (keyword o)))
