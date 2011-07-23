@@ -1,9 +1,10 @@
 (ns rpn.operators
-  (:use [rpn.stack :only [apply-op]]))
+  (:use [rpn.stack :only [apply-op]])
+  (:require [clojure.contrib.math :as math]))
 
 (defn op-n
   ([op n kw]
-   (list kw {:op op :arity n}))
+   (list (keyword kw) {:op op :arity n}))
   ([op n]
    (let [ometa (meta op)
          kw (keyword (:name ometa))]
@@ -20,13 +21,19 @@
   (apply hash-map
          (mapcat build-op ops)))
 
-(def *operators* (construct-ops + - * /))
+(def *operators*
+  (ref
+    (construct-ops
+      + - * /
+      [- 1 :neg]      [math/expt 2 "^"]
+      [math/abs 1]
+      [math/sqrt 1 "sqrt"])))
                 
 (defn operator? [o]
-  (contains? *operators* (keyword o)))
+  (contains? @*operators* (keyword o)))
 
 (defn process-op [o]
-  (let [{:keys [op arity]} (*operators* (keyword o))]
+  (let [{:keys [op arity]} (@*operators* (keyword o))]
     (if (apply-op op arity)
       true
       (println "Too few numbers on stack for operator: " o))))
