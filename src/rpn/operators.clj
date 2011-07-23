@@ -1,24 +1,26 @@
 (ns rpn.operators
   (:use [rpn.stack :only [apply-op]]))
 
-(defn binary-op
-  ([op arity]
+(defn op-n
+  ([op n kw]
+   (list kw {:op op :arity n}))
+  ([op n]
    (let [ometa (meta op)
-         kw (keyword (:name ometa))
-         arity (or arity (first (sort (:inline-arities ometa))))]
-     [kw {:op op :arity arity}]))
-  ([op]
-   (if (vector? op)
-     (apply binary-op op)
-     (binary-op op nil))))
+         kw (keyword (:name ometa))]
+     (op-n op n kw))))
+
+(defmulti build-op vector?)
+(defmethod build-op true [args]
+  (apply op-n args))
+(defmethod build-op false [op]
+  (op-n op 2))
+
 
 (defn construct-ops [& ops]
   (apply hash-map
-         (mapcat binary-op ops)))
+         (mapcat build-op ops)))
 
-
-;TODO: Fix arity on -
-(def *operators* (construct-ops + [- 2] * /))
+(def *operators* (construct-ops + - * /))
                 
 (defn operator? [o]
   (contains? *operators* (keyword o)))
