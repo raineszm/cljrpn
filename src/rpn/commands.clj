@@ -1,5 +1,7 @@
 (ns rpn.commands
-  (:use [rpn.stack]))
+  (:use [rpn.stack]
+        [rpn.operators :only [*operators*]]
+        [clojure.string :only [replace-first]]))
 
 (defn stack-pop []
   (let [val (popf)]
@@ -10,10 +12,24 @@
 (defn stack-show []
   (println "TOP> " @*main-stack* " <BOTTOM")) 
 
+(declare *cmds*)
+
+(defn- prep-keys [k]
+  (map #(replace-first (str %) ":" "") k))
+
+(defn help []
+  (do
+    (print "Basic operators: ")
+    (apply println (prep-keys (keys @*operators*)))
+    (println)
+    (print "Basic commands: ")
+    (apply println (prep-keys (keys *cmds*)))))
+
 (def *cmds*
   {
    :. stack-pop
-   :.s stack-show})
+   :.s stack-show
+   :? help})
 
 (defn cmd? [o]
   (contains? *cmds* (keyword o)))
