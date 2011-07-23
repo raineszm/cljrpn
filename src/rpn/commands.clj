@@ -20,7 +20,7 @@
 (defn help []
   (do
     (print "Basic operators: ")
-    (apply println (prep-keys (keys @*operators*)))
+    (apply println (prep-keys (keys *operators*)))
     (println)
     (print "Basic commands: ")
     (apply println (prep-keys (keys *cmds*)))))
