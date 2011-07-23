@@ -2,32 +2,35 @@
   (:use [rpn.stack :only [apply-op]])
   (:require [clojure.contrib.math :as math]))
 
-(defn op-n
-  ([op n kw]
-   (list (keyword kw) {:op op :arity n}))
-  ([op n]
-   (let [ometa (meta op)
-         kw (keyword (:name ometa))]
-     (op-n op n kw))))
+(defn- get-arity [op]
+  (let [ometa (meta op)]
+    (first (sort (:inline-arities ometa)))))
 
-(defmulti build-op vector?)
-(defmethod build-op true [args]
-  (apply op-n args))
-(defmethod build-op false [op]
-  (op-n op 2))
-
+(defn build-op
+  ([kwargs op help & arity]
+   (let [arity (or (first arity) (get-arity op))]
+     (if (vector? kwargs)
+       (mapcat #(build-op % op help arity) kwargs)
+       (list (keyword kwargs) { :op op,
+                               :help help,
+                               :arity arity}))))
+  ([args]
+   (apply build-op args)))
 
 (defn construct-ops [& ops]
   (apply hash-map
          (mapcat build-op ops)))
 
+(defn- effect [before after]
+  (str "[... " before " ] -> [... " after " ]"))
+
 (def *operators*
   (construct-ops
-    + - * /
-    [- 1 :neg]
-    [math/expt 2 "^"]
-    [math/abs 1]
-    [math/sqrt 1 "sqrt"]))
+    [:+ + (effect "x y" "x + y")]
+    [:- - (effect "x y" "x - y") 2]
+    [:* * (effect "x y" "x * y")]
+    [:neg #(- %) (effect "x" "-x") 1]
+    [["^" "**"] math/expt (effect "x y" "x**y") 2]))
                 
 (defn operator? [o]
   (contains? *operators* (keyword o)))
