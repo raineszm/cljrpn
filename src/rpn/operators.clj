@@ -20,7 +20,6 @@
                        :help (apply effect help),
                        :arity arity
                        :cmds aliases}))
-
   ([args]
    (apply build-op args)))
 
@@ -33,9 +32,10 @@
     [(join " " args) (str name "(" (join ", " args) ")")]))
 
 ;TODO:This still needs work
-(defmacro java-math [name arity & aliases]
+(defmacro java-math [name & aliases]
   (let [strname (str name)
-        aliases (conj (vec aliases) strname)]
+        aliases (conj (vec aliases) strname)
+        arity 1]
     `[~aliases #(. Math ~name %)
       ~(java-math-help strname arity) ~arity]))
 
@@ -48,10 +48,12 @@
     ["/" / ["x y" "x / y"]]
     [:neg #(- %) ["x" "-x"] 1]
     [["^" "**"] math/expt ["x y" "x**y"] 2]
-    (java-math sqrt 1 "v")
-    (java-math sin 1 "s")
-    (java-math cos 1 "c")
-    (java-math tan 1 "t")))
+    (java-math sqrt "v")
+    (java-math sin "s")
+    (java-math cos "c")
+    (java-math tan "t")
+    (java-math asin)
+    (java-math acos)))
                 
 (defn operator? [o]
   (contains? *operators* (keyword o)))
