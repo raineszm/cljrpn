@@ -12,7 +12,8 @@
 (defn popf
   ([] (if-let [p (popf 1)]
         (first p)))
-  ([n] (let [popped (take n @*main-stack*)]
+  ([n] (let [n (if (< n 0) (count @*main-stack*) n)
+             popped (take n @*main-stack*)]
          (if (= (count popped) n)
            (dosync
              (alter *main-stack* (partial drop n))

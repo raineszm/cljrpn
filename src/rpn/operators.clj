@@ -16,10 +16,11 @@
          kwargs (if (vector? kwargs) kwargs (vector kwargs))]
      (mapcat #(build-op [% op help arity] kwargs) kwargs)))
   ([[kw op help arity] aliases]
-   (list (keyword kw) { :op op,
-                       :help (apply effect help),
-                       :arity arity
-                       :cmds aliases}))
+   (let [help (if (vector? help) (apply effect help) help)]
+     (list (keyword kw) { :op op,
+                         :help help,
+                         :arity arity
+                         :cmds aliases})))
   ([args]
    (apply build-op args)))
 
@@ -48,6 +49,8 @@
     ["/" / ["x y" "x / y"]]
     [:neg #(- %) ["x" "-x"] 1]
     [["^" "**"] math/expt ["x y" "x**y"] 2]
+    ["sum" + "Sums the contents of the stack" -1]
+    ["prod" * "Multiplies the contents of the stack" -1]
     (java-math sqrt "v")
     (java-math sin "s")
     (java-math cos "c")
