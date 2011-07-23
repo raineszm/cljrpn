@@ -6,6 +6,9 @@
   (let [ometa (meta op)]
     (first (sort (:inline-arities ometa)))))
 
+(defn- effect [before after]
+  (str "[... " before " ] -> [... " after " ]"))
+
 (defn build-op
   ([kwargs op help & arity]
    (let [arity (or (first arity) (get-arity op))
@@ -24,8 +27,6 @@
   (apply hash-map
          (mapcat build-op ops)))
 
-(defn- effect [before after]
-  (str "[... " before " ] -> [... " after " ]"))
 
 (def *operators*
   (construct-ops

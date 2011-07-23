@@ -1,7 +1,8 @@
 (ns rpn.core
   (:use [rpn.commands :only [cmd? process-cmd]]
         [rpn.operators :only [operator? process-op]]
-        [rpn.stack :only [pushf]])
+        [rpn.stack :only [pushf]]
+        [rpn.modifiers :only [*last-mod* modifier? process-mod trigger-mod]])
   (:use [clojure.string :only [split]])
   (:gen-class))
 
@@ -19,6 +20,8 @@
 
 (defn process-token [tok]
   (cond
+    @*last-mod* (trigger-mod tok)
+    (modifier? tok) (process-mod tok)
     (num? tok) (process-num tok)
     (operator? tok) (process-op tok)
     (cmd? tok) (process-cmd tok)
@@ -27,7 +30,8 @@
 (defn process-line [line]
   (let [tokens (split line #"\s+")]
     (doseq [tok tokens]
-      (process-token tok))))
+      (process-token tok)))
+  (trigger-mod))
 
 
 (defn main-loop [options]
