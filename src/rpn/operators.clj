@@ -35,6 +35,19 @@
               `[~aliases (fn ~(vec args) (. Math ~name ~@args))
                 ~(java-math-help strname arity) ~arity])))
 
+(defn- mean [& args]
+  (let [n (count args)]
+    (if (pos? n)
+      (/ (apply + args) n))))
+
+(defn- variance [& args]
+  (let [n (count args)]
+    (if (pos? n)
+      (/ (apply + (map #(* % %) args)) n))))
+
+(defn- stddev [& args]
+  (if-let [s2 (apply variance args)]
+    (math/sqrt s2)))
 
 
 (def *operators*
@@ -50,6 +63,12 @@
              [["inv" "1/"] #(/ 1 %) ["x" "1/x"] 1]
              ["sum" + "Sums the contents of the stack" -1]
              ["prod" * "Multiplies the contents of the stack" -1]
+             [["mean" "mn" "av" "average"] mean
+               "Calculates the mean of all numbers on the stack" -1]
+             ["var" variance
+               "Calculates the variance of all numbers on the stack" -1]
+             [["sd" "stddev" "std-dev"] stddev
+               "Calculates the standard deviation of all numbers on the stack" -1]
              (java-math sqrt "v")
              (java-math sin "s")
              (java-math cos "c")
