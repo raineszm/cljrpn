@@ -1,7 +1,7 @@
 (ns rpn.modifiers
   (:use [rpn.operators :only [*operators* operator?]]
         [rpn.commands :only [*cmds* cmd? build-cmd]]
-        [rpn.numbers :only [hex? as-hex]]
+        [rpn.numbers :only [hex? binary? with-base]]
         [rpn.stack :only [pushf]]
         [rpn.utils]
         [clojure.string :only [replace-first]]))
@@ -39,14 +39,17 @@
      (cmd? sym) (print-help *cmds* sym)
      (modifier? sym) (print-help *modifiers* sym))))
 
-(defn hex
-  ([]
-   (println "Incomplete specifiction for .x"))
-  ([sym]
-    (if-not (hex? sym)
-      (println "Malformed command .x " sym)
-      (pushf (as-hex sym)))))
-
+(defmacro literal [code pred base]
+  (let [type-name (replace-first (str pred) "?" "")]
+    [ code
+     `(fn
+       ([]
+        (println "Incomplete specifiction for " ~code))
+       ([sym#]
+        (if-not (~pred sym#)
+          (println "Malformed command " ~code " " sym#)
+          (pushf (with-base ~base sym#)))))
+     (str "Interprets the next literal as a " type-name " integer")]))
 
 (def *last-mod* (atom nil))
 
@@ -56,8 +59,8 @@
               (str "When called with an argument displays help"
                    " information about that command. Otherwise, "
                    "displays a command list.")]
-             [:.x hex
-              "Interprets the next literal as a hex integer"]))
+             (literal "x:" hex? 16)
+             (literal "b:" binary? 2)))
 
 (defn modifier? [m]
   (contains? *modifiers* (keyword m)))

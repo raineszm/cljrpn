@@ -27,8 +27,8 @@
               "1.5" 1.5
               ".5" 0.5))
 
-(deftest test-as-hex
-         (are [x f] (= (as-hex x) f)
+(deftest test-with-base
+         (are [x f] (= (with-base 16 x) f)
               "F" 15.
               "FF" 255.
               "f" 15.
