@@ -45,6 +45,7 @@
     [["^" "**"] math/expt ["x y" "x**y"] 2]
     [["abs" "||"] math/abs ["x" "|x|"] 1]
     [["!" "fact"] factorial ["n" "n!"] 1]
+    [["inv" "1/"] #(/ 1 %) ["x" "1/x"] 1]
     ["sum" + "Sums the contents of the stack" -1]
     ["prod" * "Multiplies the contents of the stack" -1]
     (java-math sqrt "v")
@@ -52,7 +53,9 @@
     (java-math cos "c")
     (java-math tan "t")
     (java-math asin)
-    (java-math acos)))
+    (java-math acos)
+    [:e #(Math/E) "Pushes the constant e to the stack" 1]
+    [:pi #(Math/PI) "Pushes the constant pi to the stack" 1]))
                 
 (defn operator? [o]
   (contains? *operators* (keyword o)))
