@@ -1,6 +1,7 @@
 (ns rpn.commands
   (:use [rpn.stack]
-        [rpn.operators :only [*operators*]]))
+        [rpn.operators :only [*operators*]]
+        [rpn.utils :only [as-vec]]))
 
 (defn stack-pop []
   (let [val (popf)]
@@ -12,14 +13,21 @@
   (println "TOP> " @*main-stack* " <BOTTOM")) 
 
 
-(defn quit []
-  (System/exit 0))
+(defn build-cmd [kwargs cmd help]
+  (let [kwargs (as-vec kwargs)]
+    (mapcat (fn [kw]
+              [(keyword kw) {:cmd cmd :cmds kwargs :help help}]) kwargs)))
+
+(defn construct-cmds [& specs]
+  (apply hash-map
+    (mapcat #(apply build-cmd %) specs)))
+
 
 (def *cmds*
-  {
-   :. stack-pop
-   :.s stack-show
-   :quit quit})
+  (construct-cmds 
+    [:. stack-pop "Pops and prints the top of the stack"]
+    [:.s stack-show "Prints the whole stack"]
+    [[:q :quit] #(System/exit 0) "Exits the program"]))
 
 (defn cmd? [o]
   (contains? *cmds* (keyword o)))
