@@ -24,15 +24,13 @@
 
 (defn help
   ([]
-   (do
-     (print "Operators: ")
-     (apply println (prep-keys (keys *operators*)))
-     (println)
-     (print "Commands: ")
-     (apply println (prep-keys (keys *cmds*)))
-     (println)
-     (print "Modifiers: ")
-     (apply println (prep-keys (keys *modifiers*)))))
+   (doseq [[title hsh]
+         [["Operators: " *operators*]
+           ["Commands: " *cmds*]
+           ["Modifiers: " *modifiers*]]]
+     (print title)
+     (apply println (prep-keys (keys hsh)))
+     (println)))
   ([sym]
    (cond
      (operator? sym) (print-help *operators* sym)
