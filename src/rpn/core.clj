@@ -22,7 +22,7 @@
 
 (defn- get-line []
   (print-prompt)
-  (.toLowerCase (read-line)))
+  (if-let [line (read-line)] (.toLowerCase line)))
 
 (defn process-token [tok]
   (cond
