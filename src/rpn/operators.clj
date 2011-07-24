@@ -50,6 +50,7 @@
     ["/" / ["x y" "x / y"]]
     [:neg #(- %) ["x" "-x"] 1]
     [["^" "**"] math/expt ["x y" "x**y"] 2]
+    [["abs" "||"] math/abs ["x" "|x|"] 1]
     [["!" "fact"] factorial ["n" "n!"] 1]
     ["sum" + "Sums the contents of the stack" -1]
     ["prod" * "Multiplies the contents of the stack" -1]
