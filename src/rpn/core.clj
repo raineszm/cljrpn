@@ -12,6 +12,10 @@
   (print *prompt*)
   (flush))
 
+(defn- get-line []
+  (print-prompt)
+  (read-line))
+
 (defn num? [tok]
   (re-matches #"(\d+\.?\d*)|(\d*\.?\d+)" tok))
 
@@ -34,15 +38,17 @@
   (trigger-mod))
 
 
+(defn- greeting []
+  (println "cljrpn version 0.1.0 by Zach Raines"))
+
 (defn main-loop [options]
-  (print-prompt)
-  (loop [line (read-line)]
+  (greeting)
+  (loop [line (get-line)]
     (if (nil? line)
       0
       (do
         (process-line line)
-        (print-prompt)
-        (recur (read-line)))))
+        (recur (get-line)))))
   (println "Exiting..."))
 
 (defn -main [& args]
