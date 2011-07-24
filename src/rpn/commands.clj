@@ -10,7 +10,13 @@
       (println "The stack is empty..."))))
 
 (defn stack-show []
-  (println "TOP> " @*main-stack* " <BOTTOM")) 
+  (let [size (stack-size)]
+    (println "STACK:")
+    (println "(TOP)")
+    (loop [i 0]
+      (when-not (= i size)
+        (println i ": " (nth @*main-stack* i))
+        (recur (inc i))))))
 
 
 (defn build-cmd [kwargs cmd help]
