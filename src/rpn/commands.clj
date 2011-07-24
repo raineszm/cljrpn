@@ -33,5 +33,5 @@
   (contains? *cmds* (keyword o)))
 
 (defn process-cmd [o]
-  ((*cmds* (keyword o))))
+  ((-> (keyword o) *cmds* :cmd)))
 
