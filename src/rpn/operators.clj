@@ -1,5 +1,6 @@
 (ns rpn.operators
   (:use [rpn.stack :only [apply-op]]
+        [rpn.utils]
         [rpn.math])
   (:use [clojure.string :only [join]])
   (:require [clojure.contrib.math :as math]))
@@ -11,23 +12,17 @@
 (defn- effect [before after]
   (str "(STACK EFFECT) [... " before " ] -> [... " after " ]"))
 
-(defn build-op
-  ([kwargs op help & arity]
-   (let [arity (or (first arity) (get-arity op))
-         kwargs (if (vector? kwargs) kwargs (vector kwargs))]
-     (mapcat #(build-op [% op help arity] kwargs) kwargs)))
-  ([[kw op help arity] aliases]
-   (let [help (if (vector? help) (apply effect help) help)]
-     (list (keyword kw) { :op op,
-                         :help help,
-                         :arity arity
-                         :cmds aliases})))
-  ([args]
-   (apply build-op args)))
-
-(defn construct-ops [& ops]
-  (apply hash-map
-         (mapcat build-op ops)))
+(defn build-op 
+  ([kwargs op help arity]
+   (let [kwargs (as-vec kwargs)
+         help (if (vector? help) (apply effect help) help)]
+     (mapcat (fn [kw]
+               [(keyword kw) { :op op,
+                              :help help
+                              :arity arity
+                              :cmds kwargs}]) kwargs)))
+  ([kwargs op help]
+   (build-op kwargs op help (get-arity op))))
 
 (defn java-math-help [name arity]
   (let [args (map #(str "x" %) (range arity))]
@@ -42,8 +37,9 @@
       ~(java-math-help strname arity) ~arity]))
 
 
+
 (def *operators*
-  (construct-ops
+  (construct build-op
     [:+ + ["x y" "x + y"]]
     [:- - ["x y" "x - y"] 2]
     [:* * ["x y" "x * y"]]
