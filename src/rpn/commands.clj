@@ -18,6 +18,13 @@
         (println i ": " (nth @*main-stack* i))
         (recur (inc i))))))
 
+(defn dup []
+  (if-let [bot (peek @*main-stack*)]
+    (pushf bot)))
+
+(defn swap []
+  (when (>= (stack-size) 2)
+    (apply pushf (popf 2))))
 
 (defn build-cmd [kwargs cmd help]
   (let [kwargs (as-vec kwargs)]
@@ -28,6 +35,8 @@
   (construct build-cmd
     [:. stack-pop "Pops and prints the top of the stack"]
     [:.s stack-show "Prints the whole stack"]
+    [:dup dup (effect "a" "a a")]
+    [:swap swap (effect "a b" "b a")]
     [[:q :quit :.q] #(System/exit 0) "Exits the program"]))
 
 (defn cmd? [o]

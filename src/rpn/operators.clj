@@ -9,9 +9,6 @@
   (let [ometa (meta op)]
     (first (sort (:inline-arities ometa)))))
 
-(defn- effect [before after]
-  (str "(STACK EFFECT) [... " before " ] -> [... " after " ]"))
-
 (defn build-op 
   ([kwargs op help arity]
    (let [kwargs (as-vec kwargs)
