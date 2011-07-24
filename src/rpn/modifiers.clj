@@ -1,6 +1,7 @@
 (ns rpn.modifiers
   (:use [rpn.operators :only [*operators* operator?]]
-        [rpn.commands :only [*cmds* cmd?]]
+        [rpn.commands :only [*cmds* cmd? build-cmd]]
+        [rpn.utils]
         [clojure.string :only [replace-first]]))
 
 
@@ -17,6 +18,8 @@
     (println effect))
   (println))
 
+(declare modifier?)
+
 (defn help
   ([]
    (do
@@ -31,19 +34,20 @@
   ([sym]
    (cond
      (operator? sym) (print-help *operators* sym)
-     (cmd? sym) (print-help *cmds* sym))))
+     (cmd? sym) (print-help *cmds* sym)
+     (modifier? sym) (print-help *modifiers* sym))))
 
 (def *last-mod* (atom nil))
 
 (def *modifiers*
-  {
-   :? help
-   })
+  (construct build-cmd
+             [[:? :h :help] help "When called with an argument displays help information about that command. Otherwise, displays a command list."]))
+
 (defn modifier? [m]
   (contains? *modifiers* (keyword m)))
 
 (defn process-mod [m]
-  (reset! *last-mod* ((keyword m) *modifiers*)))
+  (reset! *last-mod* (-> (keyword m) *modifiers* :cmd)))
 
 (defn trigger-mod
   ([]
