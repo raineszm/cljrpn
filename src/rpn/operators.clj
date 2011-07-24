@@ -25,12 +25,15 @@
   (let [args (map #(str "x" %) (range arity))]
     [(join " " args) (str name "(" (join ", " args) ")")]))
 
-(defmacro java-math [name arity & aliases]
-  (let [strname (str name)
-        aliases (conj (vec aliases) strname)
-        args (repeatedly arity gensym)]
-    `[~aliases (fn ~(vec args) (. Math ~name ~@args))
-      ~(java-math-help strname arity) ~arity]))
+(defmacro java-math [name & [a & more :as other]]
+  (maybe-let (number? a)
+            [[arity  a 1]
+             [more more other]]
+            (let [strname (str name)
+                  aliases (conj (vec more) strname)
+                  args (repeatedly arity gensym)]
+              `[~aliases (fn ~(vec args) (. Math ~name ~@args))
+                ~(java-math-help strname arity) ~arity])))
 
 
 
@@ -47,12 +50,12 @@
     [["inv" "1/"] #(/ 1 %) ["x" "1/x"] 1]
     ["sum" + "Sums the contents of the stack" -1]
     ["prod" * "Multiplies the contents of the stack" -1]
-    (java-math sqrt 1 "v")
-    (java-math sin 1 "s")
-    (java-math cos 1 "c")
-    (java-math tan 1 "t")
-    (java-math asin 1)
-    (java-math acos 1)
+    (java-math sqrt "v")
+    (java-math sin "s")
+    (java-math cos "c")
+    (java-math tan "t")
+    (java-math asin) 
+    (java-math acos)
     [:e #(Math/E) "Pushes the constant e to the stack" 1]
     [:pi #(Math/PI) "Pushes the constant pi to the stack" 1]))
                 

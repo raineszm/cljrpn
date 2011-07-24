@@ -12,3 +12,9 @@
 
 (defn effect [before after]
   (str "(STACK EFFECT) [... " before " ] -> [... " after " ]"))
+
+(defmacro maybe-let [tst bindings & body]
+  (let [new-bindings
+        (mapcat (fn [[v t f]]
+                  [v (list `if tst t f)]) bindings)]
+    `(let ~(vec new-bindings) ~@body)))
