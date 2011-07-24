@@ -1,6 +1,8 @@
 (ns rpn.modifiers
   (:use [rpn.operators :only [*operators* operator?]]
         [rpn.commands :only [*cmds* cmd? build-cmd]]
+        [rpn.numbers :only [hex? as-hex]]
+        [rpn.stack :only [pushf]]
         [rpn.utils]
         [clojure.string :only [replace-first]]))
 
@@ -37,11 +39,25 @@
      (cmd? sym) (print-help *cmds* sym)
      (modifier? sym) (print-help *modifiers* sym))))
 
+(defn hex
+  ([]
+   (println "Incomplete specifiction for .x"))
+  ([sym]
+    (if-not (hex? sym)
+      (println "Malformed command .x " sym)
+      (pushf (as-hex sym)))))
+
+
 (def *last-mod* (atom nil))
 
 (def *modifiers*
   (construct build-cmd
-             [[:? :h :help] help "When called with an argument displays help information about that command. Otherwise, displays a command list."]))
+             [[:? :h :help] help
+              (str "When called with an argument displays help"
+                   " information about that command. Otherwise, "
+                   "displays a command list.")]
+             [:.x hex
+              "Interprets the next literal as a hex integer"]))
 
 (defn modifier? [m]
   (contains? *modifiers* (keyword m)))

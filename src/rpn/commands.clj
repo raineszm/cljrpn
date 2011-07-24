@@ -22,7 +22,7 @@
   (construct build-cmd
     [:. stack-pop "Pops and prints the top of the stack"]
     [:.s stack-show "Prints the whole stack"]
-    [[:q :quit] #(System/exit 0) "Exits the program"]))
+    [[:q :quit :.q] #(System/exit 0) "Exits the program"]))
 
 (defn cmd? [o]
   (contains? *cmds* (keyword o)))

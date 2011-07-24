@@ -1,7 +1,7 @@
 (ns rpn.core
   (:use [rpn.commands :only [cmd? process-cmd]]
         [rpn.operators :only [operator? process-op]]
-        [rpn.stack :only [pushf]]
+        [rpn.numbers :only [num? process-num]]
         [rpn.modifiers :only [*last-mod* modifier? process-mod trigger-mod]])
   (:use [clojure.string :only [split]])
   (:gen-class))
@@ -14,13 +14,7 @@
 
 (defn- get-line []
   (print-prompt)
-  (read-line))
-
-(defn num? [tok]
-  (re-matches #"(\d+\.?\d*)|(\d*\.?\d+)" tok))
-
-(defn process-num [tok]
-  (pushf (Float/parseFloat tok)))
+  (.toLowerCase (read-line)))
 
 (defn process-token [tok]
   (cond
