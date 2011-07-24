@@ -1,6 +1,6 @@
 (ns rpn.modifiers
   (:use [rpn.operators :only [*operators* operator?]]
-        [rpn.commands :only [*cmds*]]
+        [rpn.commands :only [*cmds* cmd?]]
         [clojure.string :only [replace-first]]))
 
 
@@ -9,12 +9,12 @@
 (defn- prep-keys [k]
   (map #(replace-first (str %) ":" "") k))
 
-(defn op-help [sym]
-  (let [op (sym *operators*)
+(defn print-help [table sym]
+  (let [op ((keyword sym) table)
         aliases (:cmds op)
         effect (:help op)]
     (apply println "Aliases: "(prep-keys aliases))
-    (println "Stack Effect: " effect))
+    (println effect))
   (println))
 
 (defn help
@@ -30,7 +30,8 @@
      (apply println (prep-keys (keys *modifiers*)))))
   ([sym]
    (cond
-     (operator? sym) (op-help (keyword sym)))))
+     (operator? sym) (print-help *operators* sym)
+     (cmd? sym) (print-help *cmds* sym))))
 
 (def *last-mod* (atom nil))
 

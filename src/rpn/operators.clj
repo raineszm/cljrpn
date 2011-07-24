@@ -9,7 +9,7 @@
     (first (sort (:inline-arities ometa)))))
 
 (defn- effect [before after]
-  (str "[... " before " ] -> [... " after " ]"))
+  (str "(STACK EFFECT) [... " before " ] -> [... " after " ]"))
 
 (defn build-op
   ([kwargs op help & arity]
