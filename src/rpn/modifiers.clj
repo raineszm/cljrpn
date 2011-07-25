@@ -2,15 +2,19 @@
   (:use [rpn.operators :only [*operators* operator?]]
         [rpn.commands :only [*cmds* cmd? build-cmd]]
         [rpn.numbers :only [hex? binary? with-base]]
-        [rpn.stack :only [pushf]]
+        [rpn.stack :only [pushf popf]]
+        [rpn.registers :only [set-register get-register register? used-registers]]
         [rpn.utils]
         [clojure.string :only [replace-first]]))
 
 
 (declare *modifiers*)
 
-(defn- prep-keys [k]
-  (map #(replace-first (str %) ":" "") k))
+(defn- prep-key [k]
+  (replace-first (str k) ":" ""))
+
+(defn- prep-keys [ks]
+  (map prep-key ks))
 
 (defn print-help [table sym]
   (let [op ((keyword sym) table)
@@ -37,6 +41,33 @@
      (cmd? sym) (print-help *cmds* sym)
      (modifier? sym) (print-help *modifiers* sym))))
 
+(defn store
+  ([]
+   (println "Register not specified."))
+  ([r]
+   (if (register? r)
+     (set-register r (popf))
+     (println r " is not a register."))))
+
+(defn retrieve
+  ([]
+   (println "Register not specified."))
+  ([r]
+   (if (register? r)
+     (if-let [v (get-register r)]
+       (pushf v))
+     (println r " is not a register."))))
+
+(defn register-show
+  ([]
+   (let [regs (used-registers)]
+     (doseq [[reg v] regs]
+       (println (prep-key reg) " <- " v))))
+  ([r]
+   (if (register? r)
+     (println r " <- " (get-register r))
+     (println r " is not a valid register"))))
+
 (defmacro literal [code pred base]
   (let [type-name (replace-first (str pred) "?" "")]
     [ code
@@ -57,7 +88,16 @@
               (str "When called with an argument displays help"
                    " information about that command. Otherwise, "
                    "displays a command list.")]
-             (literal "x:" hex? 16)
+             ["->" store 
+              (str "Stores the top value of the stack the register "
+                   "specified as the following token. Registers are a-z")]
+             ["<-" retrieve 
+              (str "Pushes the register "
+                   "specified as the following token to the stack. Registers are a-z")]
+             [".r" register-show 
+              (str "Prints the contents of "
+                   "register specified as the following token. Register are a-z")]
+             (literal "x:" hex? 16) 
              (literal "b:" binary? 2)))
 
 (defn modifier? [m]
