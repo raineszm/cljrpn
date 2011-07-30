@@ -1,4 +1,5 @@
 (ns rpn.operators
+  "Implements the operations of the calculator."
   (:use [rpn.stack :only [apply-op]]
         [rpn.utils]
         [rpn.math])
@@ -6,10 +7,12 @@
   (:require [clojure.contrib.math :as math]))
 
 (defn- get-arity [op]
+  "A hackish way of getting a default arity for an operator."
   (let [ometa (meta op)]
     (first (sort (:inline-arities ometa)))))
 
 (defn build-op 
+  "Parses vector DSL provided to produce entrys for the *operators* map"
   ([kwargs op help arity]
    (let [kwargs (as-vec kwargs)
          help (if (vector? help) (apply effect help) help)]
@@ -22,10 +25,13 @@
    (build-op kwargs op help (get-arity op))))
 
 (defn java-math-help [name arity]
+  "Generate a help string for a method provided via java interop"
   (let [args (map #(str "x" %) (range arity))]
     [(join " " args) (str name "(" (join ", " args) ")")]))
 
 (defmacro java-math [name & [a & more :as other]]
+  "Produce a DSL vector entry for *operators* using a method from the 
+  java Math class"
   (maybe-let (number? a)
             [[arity  a 1]
              [more more other]]
@@ -35,22 +41,13 @@
               `[~aliases (fn ~(vec args) (. Math ~name ~@args))
                 ~(java-math-help strname arity) ~arity])))
 
-(defn- mean [& args]
-  (let [n (count args)]
-    (if (pos? n)
-      (/ (apply + args) n))))
-
-(defn- variance [& args]
-  (let [n (count args)]
-    (if (pos? n)
-      (/ (apply + (map #(* % %) args)) n))))
-
-(defn- stddev [& args]
-  (if-let [s2 (apply variance args)]
-    (math/sqrt s2)))
-
-
-(def *operators*
+(def
+  ^{:doc "A map of the available operators. Each entry is itself a map with entries:
+  :op function corresponding the opreator
+  :help the help text for the operator
+  :arity the number of arguments required for the operator
+  :cmds a list of inputs which correspond to this operator"}
+  *operators*
   (construct build-op
              [:+ + ["x y" "x + y"]]
              [:- - ["x y" "x - y"] 2]
@@ -88,9 +85,11 @@
              [:pi #(Math/PI) "Pushes the constant pi to the stack" 1]))
                 
 (defn operator? [o]
+  "Determine if the string o represents a valid operator"
   (contains? *operators* (keyword o)))
 
 (defn process-op [o]
+  "Apply the operator represented by o"
   (let [{:keys [op arity]} (*operators* (keyword o))]
     (if (apply-op op arity)
       true
