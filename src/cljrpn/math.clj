@@ -1,4 +1,4 @@
-(ns rpn.math
+(ns cljrpn.math
   "Provides math functions that could not be found in standard libraries"
   (require [clojure.contrib.math :as math]))
 

@@ -1,8 +1,8 @@
-(ns rpn.operators
+(ns cljrpn.operators
   "Implements the operations of the calculator."
-  (:use [rpn.stack :only [apply-op]]
-        [rpn.utils]
-        [rpn.math])
+  (:use [cljrpn.stack :only [apply-op]]
+        [cljrpn.utils]
+        [cljrpn.math])
   (:use [clojure.string :only [join]])
   (:require [clojure.contrib.math :as math]))
 

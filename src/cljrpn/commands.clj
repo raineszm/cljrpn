@@ -1,8 +1,8 @@
-(ns rpn.commands
+(ns cljrpn.commands
   "Provides commands to the user which take no arguments such as quit"
-  (:use [rpn.stack]
-        [rpn.operators :only [*operators*]])
-  (:use [rpn.utils]))
+  (:use [cljrpn.stack]
+        [cljrpn.operators :only [*operators*]])
+  (:use [cljrpn.utils]))
 
 (defn stack-pop []
   "Pop a value from the stack and print it"

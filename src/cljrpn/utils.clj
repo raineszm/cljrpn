@@ -1,4 +1,4 @@
-(ns rpn.utils)
+(ns cljrpn.utils)
 
 (defn as-vec [x]
   "Converts x to a vector by introducing the minimally needed degree of nesting."

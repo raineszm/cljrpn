@@ -1,9 +1,9 @@
-(ns rpn.core
-  (:use [rpn.commands :only [cmd? process-cmd]]
-        [rpn.operators :only [operator? process-op]]
-        [rpn.numbers :only [num? process-num]]
-        [rpn.stack :only [stack-size]]
-        [rpn.modifiers :only [*last-mod* modifier? process-mod trigger-mod]])
+(ns cljrpn.core
+  (:use [cljrpn.commands :only [cmd? process-cmd]]
+        [cljrpn.operators :only [operator? process-op]]
+        [cljrpn.numbers :only [num? process-num]]
+        [cljrpn.stack :only [stack-size]]
+        [cljrpn.modifiers :only [*last-mod* modifier? process-mod trigger-mod]])
   (:require [clojure.string :as s])
   (:gen-class))
 

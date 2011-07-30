@@ -1,5 +1,5 @@
-(ns rpn.test.core
-  (:use [rpn.core])
+(ns cljrpn.test.core
+  (:use [cljrpn.core])
   (:use [clojure.test])
   (:use [clojure.contrib.str-utils :only [chomp]]))
 

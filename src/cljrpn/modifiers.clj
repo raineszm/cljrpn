@@ -1,10 +1,10 @@
-(ns rpn.modifiers
-  (:use [rpn.operators :only [*operators* operator?]]
-        [rpn.commands :only [*cmds* cmd? build-cmd]]
-        [rpn.numbers :only [hex? binary? with-base]]
-        [rpn.stack :only [pushf popf]]
-        [rpn.registers :only [set-register get-register register? used-registers]]
-        [rpn.utils]
+(ns cljrpn.modifiers
+  (:use [cljrpn.operators :only [*operators* operator?]]
+        [cljrpn.commands :only [*cmds* cmd? build-cmd]]
+        [cljrpn.numbers :only [hex? binary? with-base]]
+        [cljrpn.stack :only [pushf popf]]
+        [cljrpn.registers :only [set-register get-register register? used-registers]]
+        [cljrpn.utils]
         [clojure.string :only [replace-first]]))
 
 

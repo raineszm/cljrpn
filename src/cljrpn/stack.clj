@@ -1,4 +1,4 @@
-(ns rpn.stack)
+(ns cljrpn.stack)
 
 (def 
   ^{:doc "The main stack for the calculator"}

@@ -1,9 +1,9 @@
-(ns rpn.test.numbers
-  (:use [rpn.numbers]
+(ns cljrpn.test.numbers
+  (:use [cljrpn.numbers]
         [clojure.test]))
 
 (defn disconnect [f]
-  (binding [rpn.stack/pushf identity]
+  (binding [cljrpn.stack/pushf identity]
     (f)))
 
 (use-fixtures :once disconnect)

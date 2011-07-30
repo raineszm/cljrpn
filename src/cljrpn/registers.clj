@@ -1,4 +1,4 @@
-(ns rpn.registers
+(ns cljrpn.registers
   "Contains the code for handling single value registers")
 
 (def *registers* (atom {}))

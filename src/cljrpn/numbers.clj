@@ -1,6 +1,6 @@
-(ns rpn.numbers
+(ns cljrpn.numbers
   "Tools for parsing numerical input."
-  (:use [rpn.stack :only [pushf]]))
+  (:use [cljrpn.stack :only [pushf]]))
 
 (defn num? [tok]
   "Determines if the string tok represents a valid decimal number"
