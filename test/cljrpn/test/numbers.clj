@@ -1,13 +1,9 @@
 (ns cljrpn.test.numbers
   (:use [cljrpn.numbers]
+        [cljrpn.test.fixtures]
         [clojure.test]))
 
-(defn disconnect [f]
-  (binding [cljrpn.stack/pushf identity]
-    (f)))
-
 (use-fixtures :once disconnect)
-
 
 (deftest test-num?
          (are [x] (num? x)
