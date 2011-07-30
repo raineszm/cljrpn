@@ -22,7 +22,7 @@
         effect (:help op)]
     (apply println "Aliases: "(prep-keys aliases))
     (println effect))
-  (println))
+  (newline))
 
 (declare modifier?)
 
@@ -34,7 +34,7 @@
            ["Modifiers: " *modifiers*]]]
      (print title)
      (apply println (prep-keys (keys hsh)))
-     (println)))
+     (newline)))
   ([sym]
    (cond
      (operator? sym) (print-help *operators* sym)

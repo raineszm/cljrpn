@@ -12,7 +12,6 @@
   *prompt* 
   "cljrpn[s::SIZE:]> ")
 
-;Abstract the pattern subst
 (defmacro filter-proc [& substitutions]
   "Substitutions is a list of the form (pattern f pattern2 f2...)
   produces a method which replaces each supplied pattern in a string
@@ -45,7 +44,8 @@
     (num? tok) (process-num tok)
     (operator? tok) (process-op tok)
     (cmd? tok) (process-cmd tok)
-    true (println (str "FALLTHROUGH: " tok))))
+    true (println (str "Unrecognized command: " tok) 
+                  "For help try: ?")))
 
 (defn process-line [line]
   "Handle one line of input from the user"
