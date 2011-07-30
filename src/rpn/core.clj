@@ -12,14 +12,20 @@
   *prompt* 
   "cljrpn[s::SIZE:]> ")
 
-(defn- fmt-spec [string pat f]
-  "Do pattern substitution on the string. Replaces pat with the result of f"
-  (s/replace string pat (str (f))))
+;Abstract the pattern subst
+(defmacro filter-proc [& substitutions]
+  "Substitutions is a list of the form (pattern f pattern2 f2...)
+  produces a method which replaces each supplied pattern in a string
+  with the result off calling the corresponding function."
+  (let [subst (apply hash-map substitutions) ]
+  `(fn [string#]
+    (-> string# ~@(map (fn [[pat f]]
+                            `(s/replace ~pat (str (~f))))
+                          subst)))))
 
-;This could probably do with some macrofying
-(defn- fill-in [string]
-  "Do pattern substition on the prompt"
-  (-> string (fmt-spec ":SIZE:" stack-size)))
+(def fill-in
+  (filter-proc
+    ":SIZE:" stack-size))
 
 (defn print-prompt []
   "Prints the prompt."
