@@ -3,9 +3,16 @@
         [cljrpn.operators :only [operator? process-op]]
         [cljrpn.numbers :only [num? process-num]]
         [cljrpn.stack :only [stack-size]]
-        [cljrpn.modifiers :only [*last-mod* modifier? process-mod trigger-mod]])
+        [cljrpn.modifiers :only [*last-mod* modifier? process-mod trigger-mod]]
+        [clojure.contrib.command-line])
   (:require [clojure.string :as s])
   (:gen-class))
+
+(def cljrpn-version
+  "0.1.0")
+
+(defn print-version []
+  (println "cljrpn version" cljrpn-version "by Zach Raines"))
 
 (def
   ^{:doc "The command prompt. Substitutions are done via fill-in"}
@@ -57,7 +64,7 @@
 
 (defn- greeting []
   "Display the startup header."
-  (println "cljrpn version 0.1.0 by Zach Raines"))
+  (print-version))
 
 (defn main-loop [options]
   "The big show."
@@ -71,4 +78,12 @@
   (println "Exiting..."))
 
 (defn -main [& args]
-  (main-loop {}))
+  (with-command-line args
+                     "cljrpn -- a simple rpn calculator in Clojure"
+                     [[execute e "Execute the supplied commands and then exit"]
+                      [version? v? "Print the version string"]
+                      argv]
+                     (cond
+                       execute (process-line execute)
+                       version? (print-version)
+                       :else (main-loop {}))))
