@@ -51,7 +51,7 @@
     (num? tok) (process-num tok)
     (operator? tok) (process-op tok)
     (cmd? tok) (process-cmd tok)
-    true (println (str "Unrecognized command: " tok) 
+    :else (println (str "Unrecognized command: " tok) 
                   "For help try: ?")))
 
 (defn process-line [line]

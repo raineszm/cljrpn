@@ -5,7 +5,7 @@
   (cond
     (vector? x) x
     (list? x) (vec x)
-    true (vector x)))
+    :else (vector x)))
 
 (defmacro construct [builder & specs]
   "Used to build a map of data specified as a list of vectors. builder is applied
