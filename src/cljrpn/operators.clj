@@ -58,6 +58,10 @@
              [["abs" "||"] math/abs ["x" "|x|"] 1]
              [["!" "fact"] factorial ["n" "n!"] 1]
              [["inv" "1/"] #(/ 1 %) ["x" "1/x"] 1]
+             [["bin" "binom" "cmb"]
+              binom
+              (str "Calculates the binomial coefficent (m n) "
+                   "also known as mCn or m choose n") 2]
              ["sum" + "Sums the contents of the stack" -1]
              ["prod" * "Multiplies the contents of the stack" -1]
              [["mean" "mn" "av" "average"] mean

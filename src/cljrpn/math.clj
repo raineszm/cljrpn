@@ -23,3 +23,15 @@
 (defn stddev [& args]
   (if-let [s2 (apply variance args)]
     (math/sqrt s2)))
+
+
+(defn binom [m n]
+  "Returns the binomial coefficent of (m n). Also known as m C n or \"m choose n\""
+  (let [m-n (- m n)
+        greater (max n m-n)
+        lesser (max (min n m-n) 1)]
+    (/ (loop [m m
+              acc 1]
+         (if (> m greater)
+           (recur (dec m) (* acc m))
+           acc)) (factorial lesser))))
