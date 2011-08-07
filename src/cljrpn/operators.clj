@@ -95,6 +95,5 @@
 (defn process-op [o]
   "Apply the operator represented by o"
   (let [{:keys [op arity]} (*operators* (keyword o))]
-    (if (apply-op op arity)
-      true
+    (if-not (apply-op op arity)
       (println "Too few numbers on stack for operator: " o))))

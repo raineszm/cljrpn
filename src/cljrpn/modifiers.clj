@@ -10,17 +10,12 @@
 
 (declare *modifiers*)
 
-(defn- prep-key [k]
-  (replace-first (str k) ":" ""))
-
-(defn- prep-keys [ks]
-  (map prep-key ks))
 
 (defn print-help [table sym]
   (let [op ((keyword sym) table)
         aliases (:cmds op)
         effect (:help op)]
-    (apply println "Aliases: "(prep-keys aliases))
+    (apply println "Aliases: "(map name aliases))
     (println effect))
   (newline))
 
@@ -33,7 +28,7 @@
            ["Commands: " *cmds*]
            ["Modifiers: " *modifiers*]]]
      (print title)
-     (apply println (prep-keys (keys hsh)))
+     (apply println (map name (keys hsh)))
      (newline)))
   ([sym]
    (cond
@@ -62,7 +57,7 @@
   ([]
    (let [regs (used-registers)]
      (doseq [[reg v] regs]
-       (println (prep-key reg) " <- " v))))
+       (println (name reg) " <- " v))))
   ([r]
    (if (register? r)
      (println r " <- " (get-register r))
