@@ -28,7 +28,7 @@
            ["Commands: " *cmds*]
            ["Modifiers: " *modifiers*]]]
      (print title)
-     (apply println (map name (keys hsh)))
+     (apply println (map name (sort (keys hsh))))
      (newline)))
   ([sym]
    (cond
@@ -84,7 +84,7 @@
                    " information about that command. Otherwise, "
                    "displays a command list.")]
              ["->" store 
-              (str "Stores the top value of the stack the register "
+              (str "Stores the top value of the stack to the register "
                    "specified as the following token. Registers are a-z")]
              ["<-" retrieve 
               (str "Pushes the register "

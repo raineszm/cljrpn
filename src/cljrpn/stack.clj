@@ -34,10 +34,6 @@
   "Empties the stack"
   (dosync (ref-set *main-stack* '())))
 
-
-
-
-
 (defn apply-op [op n]
   "Apply the function op to the top n members of the stack."
   (dosync

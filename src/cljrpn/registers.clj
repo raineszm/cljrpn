@@ -18,4 +18,3 @@
 (defn used-registers []
   "Return a list of of register name (as keywords) with non nil values"
   (sort (filter val @*registers*)))
-
