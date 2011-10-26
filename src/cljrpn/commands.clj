@@ -47,6 +47,7 @@
     [:.s stack-show "Prints the whole stack"]
     [:dup dup (effect "a" "a a")]
     [:swap swap (effect "a b" "b a")]
+    [[:clear :.c] clear-stack "Empties the stack"]
     [[:q :quit :.q] #(System/exit 0) "Exits the program"]))
 
 (defn cmd? [o]
