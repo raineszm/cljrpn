@@ -3,8 +3,6 @@
         [cljrpn.test.fixtures]
         [clojure.test]))
 
-(use-fixtures :once disconnect)
-
 (deftest test-build-op
          (is (=
                (build-op :+ + "+" 2)

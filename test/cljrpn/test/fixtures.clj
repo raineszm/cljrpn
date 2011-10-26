@@ -1,6 +1,11 @@
-(ns cljrpn.test.fixtures)
+(ns cljrpn.test.fixtures
+  (:use [cljrpn.stack :only [clear-stack popf]]))
 
-(defn disconnect [f]
-  (binding [cljrpn.stack/pushf identity]
-    (f)))
+(defmacro through-stack [form]
+  `(do ~form
+     (popf)))
+
+(defn clear [f]
+  (clear-stack)
+  (f))
 

@@ -3,7 +3,7 @@
         [cljrpn.test.fixtures]
         [clojure.test]))
 
-(use-fixtures :once disconnect)
+(use-fixtures :once clear)
 
 (deftest test-num?
          (are [x] (num? x)
@@ -18,7 +18,7 @@
               "3g" "waffle" "2.0"))
 
 (deftest test-process-num
-         (are [f n] (= (process-num f) n)
+         (are [f n] (= (through-stack (process-num f)) n)
               "3" 3.0
               "1.5" 1.5
               ".5" 0.5))
