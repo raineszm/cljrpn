@@ -41,5 +41,5 @@
 (defn apply-op [op n]
   "Apply the function op to the top n members of the stack."
   (dosync
-    (if-let [args (reverse (popf n))]
-      (pushf (apply op args)))))
+    (if-let [args (popf n)]
+      (pushf (apply op (reverse args))))))
