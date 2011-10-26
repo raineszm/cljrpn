@@ -50,10 +50,10 @@
   ^:dynamic
   *operators*
   (construct build-op
-             [:+ + ["x y" "x + y"]]
+             [:+ + ["x y" "x + y"] 2]
              [:- - ["x y" "x - y"] 2]
-             [:* * ["x y" "x * y"]]
-             ["/" / ["x y" "x / y"]]
+             [:* * ["x y" "x * y"] 2]
+             ["/" / ["x y" "x / y"] 2]
              [:neg #(- %) ["x" "-x"] 1]
              [["^" "**"] math/expt ["x y" "x**y"] 2]
              [["abs" "||"] math/abs ["x" "|x|"] 1]
