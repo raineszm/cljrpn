@@ -4,7 +4,7 @@
         [cljrpn.numbers :only [num? process-num]]
         [cljrpn.stack :only [stack-size]]
         [cljrpn.modifiers :only [*last-mod* modifier? process-mod trigger-mod]]
-        [clojure.contrib.command-line])
+        [clojure.tools.cli])
   (:require [clojure.string :as s])
   (:gen-class))
 
@@ -16,6 +16,7 @@
 
 (def
   ^{:doc "The command prompt. Substitutions are done via fill-in"}
+  ^:dynamic
   *prompt* 
   "cljrpn[s::SIZE:]> ")
 
@@ -78,12 +79,11 @@
   (println "Exiting..."))
 
 (defn -main [& args]
-  (with-command-line args
-                     "cljrpn -- a simple rpn calculator in Clojure"
-                     [[execute e "Execute the supplied commands and then exit"]
-                      [version? v? "Print the version string"]
-                      argv]
-                     (cond
-                       execute (process-line execute)
-                       version? (print-version)
-                       :else (main-loop {}))))
+  (let [cmd-map (cli args
+                     ;"cljrpn -- a simple rpn calculator in Clojure"
+                     (optional ["-e" "--execute" "Execute the supplied commands and then exit" :default nil])
+                     (optional ["-v" "--version" "Print the version string" :default false]))]
+    (cond
+      (:execute cmd-map) (process-line (:execute cmd-map))
+      (:version cmd-map) (print-version)
+      :else (main-loop {}))))

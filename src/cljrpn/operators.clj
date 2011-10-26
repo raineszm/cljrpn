@@ -4,7 +4,7 @@
         [cljrpn.utils]
         [cljrpn.math])
   (:use [clojure.string :only [join]])
-  (:require [clojure.contrib.math :as math]))
+  (:require [clojure.math.numeric-tower :as math]))
 
 (defn- get-arity [op]
   "A hackish way of getting a default arity for an operator."
@@ -47,6 +47,7 @@
   :help the help text for the operator
   :arity the number of arguments required for the operator
   :cmds a list of inputs which correspond to this operator"}
+  ^:dynamic
   *operators*
   (construct build-op
              [:+ + ["x y" "x + y"]]

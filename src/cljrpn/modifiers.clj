@@ -8,7 +8,7 @@
         [clojure.string :only [replace-first]]))
 
 
-(declare *modifiers*)
+(declare ^:dynamic *modifiers*)
 
 
 (defn print-help [table sym]
@@ -75,9 +75,9 @@
           (pushf (with-base ~base sym#)))))
      (str "Interprets the next literal as a " type-name " integer")]))
 
-(def *last-mod* (atom nil))
+(def ^:dynamic *last-mod* (atom nil))
 
-(def *modifiers*
+(def ^:dynamic *modifiers*
   (construct build-cmd
              [[:? :h :help] help
               (str "When called with an argument displays help"

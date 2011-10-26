@@ -1,7 +1,7 @@
 (ns cljrpn.registers
   "Contains the code for handling single value registers")
 
-(def *registers* (atom {}))
+(def ^:dynamic *registers* (atom {}))
 
 (defn register? [r]
   "Determine whether the provided string is a valid register name"

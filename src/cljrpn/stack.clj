@@ -2,6 +2,7 @@
 
 (def 
   ^{:doc "The main stack for the calculator"}
+  ^:dynamic
   *main-stack* 
   (ref ()))
 
