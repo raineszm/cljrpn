@@ -38,10 +38,10 @@
               [(keyword kw) {:cmd cmd :cmds kwargs :help help}]) kwargs)))
 
 (def
-  ^{:doc "Map of the commands available and their attributes. Commands are
-  accessed by the text used to issue them in the interpreter."}
   ^:dynamic
   *cmds*
+  "Map of the commands available and their attributes. Commands are
+  accessed by the text used to issue them in the interpreter."
   (construct build-cmd
     [:. stack-pop "Pops and prints the top of the stack"]
     [:.s stack-show "Prints the whole stack"]

@@ -15,9 +15,9 @@
   (println "cljrpn version" cljrpn-version "by Zach Raines"))
 
 (def
-  ^{:doc "The command prompt. Substitutions are done via fill-in"}
   ^:dynamic
-  *prompt* 
+  *prompt*
+  "The command prompt. Substitutions are done via fill-in"
   "cljrpn[s::SIZE:]> ")
 
 (defmacro filter-proc [& substitutions]
@@ -79,10 +79,13 @@
   (println "Exiting..."))
 
 (defn -main [& args]
-  (let [cmd-map (cli args
-                     ;"cljrpn -- a simple rpn calculator in Clojure"
-                     (optional ["-e" "--execute" "Execute the supplied commands and then exit" :default nil])
-                     (optional ["-v" "--version" "Print the version string" :default false]))]
+  (let [cmd-map
+        (cli args
+             ;"cljrpn -- a simple rpn calculator in Clojure"
+             (optional
+               ["-e" "--execute" "Execute the supplied commands and then exit" :default nil])
+             (optional
+               ["-v" "--version" "Print the version string" :default false]))]
     (cond
       (:execute cmd-map) (process-line (:execute cmd-map))
       (:version cmd-map) (print-version)

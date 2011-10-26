@@ -42,13 +42,13 @@
                 ~(java-math-help strname arity) ~arity])))
 
 (def
-  ^{:doc "A map of the available operators. Each entry is itself a map with entries:
+  ^:dynamic
+  *operators*
+  "A map of the available operators. Each entry is itself a map with entries:
   :op function corresponding the opreator
   :help the help text for the operator
   :arity the number of arguments required for the operator
-  :cmds a list of inputs which correspond to this operator"}
-  ^:dynamic
-  *operators*
+  :cmds a list of inputs which correspond to this operator"
   (construct build-op
              [:+ + ["x y" "x + y"] 2]
              [:- - ["x y" "x - y"] 2]

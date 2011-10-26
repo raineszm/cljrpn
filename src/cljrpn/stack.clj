@@ -1,9 +1,9 @@
 (ns cljrpn.stack)
 
 (def 
-  ^{:doc "The main stack for the calculator"}
   ^:dynamic
-  *main-stack* 
+  *main-stack*
+  "The main stack for the calculator"
   (ref ()))
 
 (defn stack-size []
