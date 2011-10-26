@@ -1,7 +1,6 @@
 (ns cljrpn.commands
   "Provides commands to the user which take no arguments such as quit"
-  (:use [cljrpn.stack]
-        [cljrpn.operators :only [*operators*]])
+  (:use [cljrpn.stack])
   (:use [cljrpn.utils]))
 
 (defn stack-pop []
@@ -38,8 +37,7 @@
               [(keyword kw) {:cmd cmd :cmds kwargs :help help}]) kwargs)))
 
 (def
-  ^:dynamic
-  *cmds*
+  cmd-table
   "Map of the commands available and their attributes. Commands are
   accessed by the text used to issue them in the interpreter."
   (construct build-cmd
@@ -52,9 +50,9 @@
 
 (defn cmd? [o]
   "Determine if the string o names a valid command."
-  (contains? *cmds* (keyword o)))
+  (contains? cmd-table (keyword o)))
 
 (defn process-cmd [o]
   "Handle one command frome the user"
-  ((-> (keyword o) *cmds* :cmd)))
+  ((-> (keyword o) cmd-table :cmd)))
 

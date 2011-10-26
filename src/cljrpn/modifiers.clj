@@ -1,6 +1,6 @@
 (ns cljrpn.modifiers
-  (:use [cljrpn.operators :only [*operators* operator?]]
-        [cljrpn.commands :only [*cmds* cmd? build-cmd]]
+  (:use [cljrpn.operators :only [op-table operator?]]
+        [cljrpn.commands :only [cmd-table cmd? build-cmd]]
         [cljrpn.numbers :only [hex? binary? with-base]]
         [cljrpn.stack :only [pushf popf]]
         [cljrpn.registers :only [set-register get-register register? used-registers]]
@@ -8,8 +8,7 @@
         [clojure.string :only [replace-first]]))
 
 
-(declare ^:dynamic *modifiers*)
-
+(declare mod-table)
 
 (defn print-help [table sym]
   (let [op ((keyword sym) table)
@@ -24,17 +23,17 @@
 (defn help
   ([]
    (doseq [[title hsh]
-         [["Operators: " *operators*]
-           ["Commands: " *cmds*]
-           ["Modifiers: " *modifiers*]]]
+         [["Operators: " op-table]
+           ["Commands: " cmd-table]
+           ["Modifiers: " mod-table]]]
      (print title)
      (apply println (map name (sort (keys hsh))))
      (newline)))
   ([sym]
    (cond
-     (operator? sym) (print-help *operators* sym)
-     (cmd? sym) (print-help *cmds* sym)
-     (modifier? sym) (print-help *modifiers* sym))))
+     (operator? sym) (print-help op-table sym)
+     (cmd? sym) (print-help cmd-table sym)
+     (modifier? sym) (print-help mod-table sym))))
 
 (defn store
   ([]
@@ -77,7 +76,7 @@
 
 (def ^:dynamic *last-mod* (atom nil))
 
-(def ^:dynamic *modifiers*
+(def mod-table
   (construct build-cmd
              [[:? :h :help] help
               (str "When called with an argument displays help"
@@ -96,10 +95,10 @@
              (literal "b:" binary? 2)))
 
 (defn modifier? [m]
-  (contains? *modifiers* (keyword m)))
+  (contains? mod-table (keyword m)))
 
 (defn process-mod [m]
-  (reset! *last-mod* (-> (keyword m) *modifiers* :cmd)))
+  (reset! *last-mod* (-> (keyword m) mod-table :cmd)))
 
 (defn trigger-mod
   ([]

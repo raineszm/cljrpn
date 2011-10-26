@@ -12,7 +12,7 @@
     (first (sort (:inline-arities ometa)))))
 
 (defn build-op 
-  "Parses vector DSL provided to produce entrys for the *operators* map"
+  "Parses vector DSL provided to produce entrys for the op-table map"
   ([kwargs op help arity]
    (let [kwargs (as-vec kwargs)
          help (if (vector? help) (apply effect help) help)]
@@ -30,7 +30,7 @@
     [(join " " args) (str name "(" (join ", " args) ")")]))
 
 (defmacro java-math [name & [a & more :as other]]
-  "Produce a DSL vector entry for *operators* using a method from the 
+  "Produce a DSL vector entry for operators using a method from the 
   java Math class"
   (maybe-let (number? a)
             [[arity  a 1]
@@ -42,8 +42,7 @@
                 ~(java-math-help strname arity) ~arity])))
 
 (def
-  ^:dynamic
-  *operators*
+  op-table
   "A map of the available operators. Each entry is itself a map with entries:
   :op function corresponding the opreator
   :help the help text for the operator
@@ -91,10 +90,10 @@
                 
 (defn operator? [o]
   "Determine if the string o represents a valid operator"
-  (contains? *operators* (keyword o)))
+  (contains? op-table (keyword o)))
 
 (defn process-op [o]
   "Apply the operator represented by o"
-  (let [{:keys [op arity]} (*operators* (keyword o))]
+  (let [{:keys [op arity]} (op-table (keyword o))]
     (if-not (apply-op op arity)
       (println "Too few numbers on stack for operator: " o))))
