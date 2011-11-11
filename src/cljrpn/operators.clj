@@ -85,8 +85,8 @@
              (java-math signum "sgn")
              (java-math toDegrees "deg")
              (java-math toRadians "rad")
-             [:e #(Math/E) "Pushes the constant e to the stack" 1]
-             [:pi #(Math/PI) "Pushes the constant pi to the stack" 1]))
+             [:e #(Math/E) "Pushes the constant e to the stack" 0]
+             [:pi #(Math/PI) "Pushes the constant pi to the stack" 0]))
                 
 (defn operator? [o]
   "Determine if the string o represents a valid operator"
