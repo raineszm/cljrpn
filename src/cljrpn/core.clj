@@ -23,7 +23,7 @@
 (defmacro filter-proc [& substitutions]
   "Substitutions is a list of the form (pattern f pattern2 f2...)
   produces a method which replaces each supplied pattern in a string
-  with the result off calling the corresponding function."
+  with the result of calling the corresponding function."
   (let [subst (apply hash-map substitutions) ]
   `(fn [string#]
     (-> string# ~@(map (fn [[pat f]]
@@ -34,14 +34,14 @@
   (filter-proc
     ":SIZE:" stack-size))
 
-(defn print-prompt []
+(defn print-prompt [prompt]
   "Prints the prompt."
-  (print (fill-in *prompt*))
+  (print (fill-in prompt))
   (flush))
 
-(defn- get-line []
+(defn- get-line [prompt]
   "Prompts the user and returns the input lowercased."
-  (print-prompt)
+  (print-prompt prompt)
   (if-let [line (read-line)] (.toLowerCase line)))
 
 (defn process-token [tok]
@@ -69,17 +69,18 @@
 
 (defn main-loop [options]
   "The big show."
-  (greeting)
-  (loop [line (get-line)]
-    (if (nil? line)
-      0
-      (do
-        (process-line line)
-        (recur (get-line)))))
+  (let [prompt (or (:prompt options) *prompt*)]
+    (greeting)
+    (loop [line (get-line prompt)]
+      (if (nil? line)
+        0
+        (do
+          (process-line line)
+          (recur (get-line prompt))))))
   (println "Exiting..."))
 
 (defn -main [& args]
-  (let [cmd-map
+  (let [flags
         (cli args
              ;"cljrpn -- a simple rpn calculator in Clojure"
              (optional
@@ -87,6 +88,6 @@
              (optional
                ["-v" "--version" "Print the version string" :default false]))]
     (cond
-      (:execute cmd-map) (process-line (:execute cmd-map))
-      (:version cmd-map) (print-version)
+      (:execute flags) (process-line (:execute flags))
+      (:version flags) (print-version)
       :else (main-loop {}))))
