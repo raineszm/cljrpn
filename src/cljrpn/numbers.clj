@@ -4,7 +4,7 @@
 
 (defn num? [tok]
   "Determines if the string tok represents a valid decimal number"
-  (re-matches #"-(\d+\.?\d*)|(\d*\.?\d+)" tok))
+  (re-matches #"-(\d+\.?\d*)|(\d*\.?\d+)(e\d+)?" tok))
 
 (defn process-num [tok]
   "Parses a number and pushes it to the stack"
