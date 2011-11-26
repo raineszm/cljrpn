@@ -80,14 +80,13 @@
   (println "Exiting..."))
 
 (defn -main [& args]
-  (let [flags
+  (let [[flags args banner]
         (cli args
-             ;"cljrpn -- a simple rpn calculator in Clojure"
-             (optional
-               ["-e" "--execute" "Execute the supplied commands and then exit" :default nil])
-             (optional
-               ["-v" "--version" "Print the version string" :default false]))]
+               ["-e" "--execute" "Execute the supplied commands and then exit" :default nil]
+               ["-v" "--version" "Print the version string" :default false :flag true]
+               ["-h" "--help" "Display this help dialog" :default false :flag true])]
     (cond
+      (:help flags) (println banner)
       (:execute flags) (process-line (:execute flags))
       (:version flags) (print-version)
       :else (main-loop {}))))
