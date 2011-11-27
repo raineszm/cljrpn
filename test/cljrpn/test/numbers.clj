@@ -8,6 +8,8 @@
 (deftest test-num?
          (are [x] (num? x)
               "1" "1.0" ".5" "5.")
+         (are [x] (num? x)
+              "1e0" "1e5" "1e-5")
          (are [x] (not (num? x))
               "apple" "f" "1.1." "1..0" "1.0."))
 
