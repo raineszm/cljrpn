@@ -1,11 +1,10 @@
-(ns cljrpn.test.fixtures
+(ns cljrpn.test.helpers
   (:use [cljrpn.stack :only [clear-stack popf]]))
 
 (defmacro through-stack [form]
   `(do ~form
      (popf)))
 
-(defn clear [f]
-  (clear-stack)
-  (f))
+(defn prepare []
+  (clear-stack))
 

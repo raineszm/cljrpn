@@ -1,10 +1,9 @@
 (ns cljrpn.test.numbers
+  (:require [cljrpn.test.helpers :as helpers])
   (:use cljrpn.numbers
-        cljrpn.test.fixtures
-        clojure.test
         midje.sweet))
 
-(use-fixtures :once clear)
+(background (before :facts (helpers/prepare)))
 
 (tabular "The finer points of number matching"
          (fact ?number => num?)
@@ -31,11 +30,11 @@
          
 
 (tabular "Proper processing of numbers"
-  (fact (through-stack (process-num ?str)) => ?num)
-  ?str  ?num
-  "3"   3.0
-  "1.5" 1.5
-  ".5"  0.5)
+         (fact (helpers/through-stack (process-num ?str)) => ?num)
+         ?str  ?num
+         "3"   3.0
+         "1.5" 1.5
+         ".5"  0.5)
 
 (tabular "Proper processing of numbers"
          (fact (with-base 16 ?str) => ?num)
