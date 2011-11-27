@@ -6,11 +6,6 @@
   (:use [clojure.string :only [join]])
   (:require [clojure.math.numeric-tower :as math]))
 
-(defn- get-arity [op]
-  "A hackish way of getting a default arity for an operator."
-  (let [ometa (meta op)]
-    (first (sort (:inline-arities ometa)))))
-
 (defn build-op 
   "Parses vector DSL provided to produce entrys for the op-table map"
   ([kwargs op help arity]
@@ -20,9 +15,7 @@
                [(keyword kw) { :op op,
                               :help help
                               :arity arity
-                              :cmds kwargs}]) kwargs)))
-  ([kwargs op help]
-   (build-op kwargs op help (get-arity op))))
+                              :cmds kwargs}]) kwargs))))
 
 (defn java-math-help [name arity]
   "Generate a help string for a method provided via java interop"
