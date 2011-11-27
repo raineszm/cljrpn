@@ -31,7 +31,7 @@
     (apply pushf (popf 2))))
 
 (defn build-cmd [kwargs cmd help]
-  "Allows aliases for a command to be specified."
+  "Takes a list of the form [kwargs cmd help] and expands this into a collection of entries for the command table. Kwargs is a list of keywords which should be intrepreted as this supplied command, cmd is a command to be run, and help is the appropriate help text."
   (let [kwargs (as-vec kwargs)]
     (mapcat (fn [kw]
               [(keyword kw) {:cmd cmd :cmds kwargs :help help}]) kwargs)))
@@ -49,7 +49,7 @@
     [[:q :quit :.q] #(System/exit 0) "Exits the program"]))
 
 (defn cmd? [o]
-  "Determine if the string o names a valid command."
+  "Determine if the string _o_ names a valid command."
   (contains? cmd-table (keyword o)))
 
 (defn process-cmd [o]

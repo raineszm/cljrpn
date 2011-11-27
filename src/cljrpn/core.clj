@@ -17,11 +17,11 @@
 (def
   ^:dynamic
   *prompt*
-  "The command prompt. Substitutions are done via fill-in"
+  "The command prompt. Substitutions are done via fill-in. In the future this should be configuratble by the user."
   "cljrpn[s::SIZE:]> ")
 
 (defmacro filter-proc [& substitutions]
-  "Substitutions is a list of the form (pattern f pattern2 f2...)
+  "Substitutions is a list of the form (pattern1 f1 pattern2 f2...)
   produces a method which replaces each supplied pattern in a string
   with the result of calling the corresponding function."
   (let [subst (apply hash-map substitutions) ]
@@ -35,12 +35,12 @@
     ":SIZE:" stack-size))
 
 (defn print-prompt [prompt]
-  "Prints the prompt."
+  "Prints the prompt. A new-line is not appended."
   (print (fill-in prompt))
   (flush))
 
 (defn- get-line [prompt]
-  "Prompts the user and returns the input lowercased."
+  "Prompts the user and returns the input as a lowercase string."
   (print-prompt prompt)
   (if-let [line (read-line)] (.toLowerCase line)))
 
@@ -56,7 +56,7 @@
                   "For help try: ?")))
 
 (defn process-line [line]
-  "Handle one line of input from the user"
+  "Handle one line of input from the user. Input is split on white space and each \"word\" ithen processed as a token."
   (let [tokens (s/split line #"\s+")]
     (doseq [tok tokens]
       (process-token tok)))
@@ -68,7 +68,7 @@
   (print-version))
 
 (defn main-loop [options]
-  "The big show."
+  "The big show. The options hash is here to allow for an rc file in future versions."
   (let [prompt (or (:prompt options) *prompt*)]
     (greeting)
     (loop [line (get-line prompt)]
@@ -81,10 +81,12 @@
 
 (defn -main [& args]
   (let [[flags args banner]
-        (cli args
-               ["-e" "--execute" "Execute the supplied commands and then exit" :default nil]
-               ["-v" "--version" "Print the version string" :default false :flag true]
-               ["-h" "--help" "Display this help dialog" :default false :flag true])]
+        ; Parse our command line arguments
+        (cli
+          args
+          ["-e" "--execute" "Execute the supplied commands and then exit" :default nil]
+          ["-v" "--version" "Print the version string" :default false :flag true]
+          ["-h" "--help" "Display this help dialog" :default false :flag true])]
     (cond
       (:help flags) (println banner)
       (:execute flags) (process-line (:execute flags))
