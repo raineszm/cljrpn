@@ -5,20 +5,17 @@
 
 (defn stack-pop []
   "Pop a value from the stack and print it"
-  (let [val (popf)]
-    (if val
-      (println val)
-      (println "The stack is empty..."))))
+  (if-let [top (popf)]
+      (println top)
+      (println "The stack is empty...")))
 
 (defn stack-show []
   "Print the entire contents of the main stack."
   (let [size (stack-size)]
     (println "STACK:")
     (println "(TOP)")
-    (loop [i 0]
-      (when-not (= i size)
-        (println i ": " (nth @*main-stack* i))
-        (recur (inc i))))))
+    (doseq [i (range size)]
+        (println i ": " (nth @*main-stack* i)))))
 
 (defn dup []
   "Duplicate the top of the stack"
@@ -33,8 +30,13 @@
 (defn build-cmd [kwargs cmd help]
   "Takes a list of the form [kwargs cmd help] and expands this into a collection of entries for the command table. Kwargs is a list of keywords which should be intrepreted as this supplied command, cmd is a command to be run, and help is the appropriate help text."
   (let [kwargs (as-vec kwargs)]
-    (mapcat (fn [kw]
-              [(keyword kw) {:cmd cmd :cmds kwargs :help help}]) kwargs)))
+    (mapcat
+      (fn [kw]
+        [(keyword kw)
+         {:cmd cmd
+          :cmds kwargs
+          :help help}])
+      kwargs)))
 
 (def
   cmd-table
