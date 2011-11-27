@@ -91,5 +91,8 @@
 (defn process-op [o]
   "Apply the operator represented by o"
   (let [{:keys [op arity]} (op-table (keyword o))]
-    (if-not (apply-op op arity)
-      (println "Too few numbers on stack for operator: " o))))
+    (try
+      (if-not (apply-op op arity)
+        (println "Too few numbers on stack for operator: " o))
+      (catch AssertionError e
+        (println "Precondition for" o "not met.")))))
