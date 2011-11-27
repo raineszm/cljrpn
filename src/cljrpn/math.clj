@@ -2,7 +2,11 @@
   "Provides math functions that could not be found in standard libraries"
   (require [clojure.math.numeric-tower :as math]))
 
+(defn- lax-integer? [i]
+  (== i (Math/floor i)))
+
 (defn factorial [n]
+  {:pre [(lax-integer? n) (not (neg? n))]}
   "Return the factorial of n"
   (loop [n n
          acc 1]
@@ -26,7 +30,7 @@
 
 
 (defn binom [m n]
-  "Returns the binomial coefficent of (m n). Also known as m C n or \"m choose n\""
+  "Returns the binomial coefficent of (m n). Also known as \"m C n\" or \"m choose n\""
   (let [m-n (- m n)
         greater (max n m-n)
         lesser (max (min n m-n) 1)]

@@ -11,7 +11,12 @@
               3 6
               4 24
               5 120
-              6 720))
+              6 720)
+         (are [n]
+              -1
+              4.2
+              -4.2
+           (thrown? AssertionError (factorial n))))
 
 (deftest test-mean
          (is (=
