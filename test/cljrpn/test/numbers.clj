@@ -1,36 +1,46 @@
 (ns cljrpn.test.numbers
-  (:use [cljrpn.numbers]
-        [cljrpn.test.fixtures]
-        [clojure.test]))
+  (:use cljrpn.numbers
+        cljrpn.test.fixtures
+        clojure.test
+        midje.sweet))
 
 (use-fixtures :once clear)
 
-(deftest test-num?
-         (are [x] (num? x)
-              "1" "1.0" ".5" "5.")
-         (are [x] (num? x)
-              "-4" "-4.3" "-.5")
-         (are [x] (num? x)
-              "1e0" "1e5" "1e-5" "-3e2" "-4e-3" "0.5e2" "1.6e17")
-         (are [x] (not (num? x))
-              "apple" "f" "1.1." "1..0" "1.0."
-              "." "-." ".e4"))
+(tabular "The finer points of number matching"
+         (fact ?number => num?)
+         ?number
+         "1" "1.0" ".5" "5." "-4" "-4.3" "-.5" "1e0"
+         "1e5" "1e-5" "-3e2" "-4e-3" "0.5e2" "1.6e17")
 
-(deftest test-hex?
-         (are [x] (hex? x)
-              "a" "A" "0A" "deadbeef")
-         (are [x] (not (hex? x))
-              "3g" "waffle" "2.0"))
+(tabular "The finer points of number matching (unwanted matches)"
+         (fact ?number =not=> num?)
+         ?number
+         "apple" "f" "1.1." "1..0" "1.0." 
+         "." "-." ".e4")
 
-(deftest test-process-num
-         (are [f n] (= (through-stack (process-num f)) n)
-              "3" 3.0
-              "1.5" 1.5
-              ".5" 0.5))
+(tabular "Hexidemical recognition"
+         (fact ?val ?arrow hex?) 
+         ?val         ?arrow
+         "a"          =>
+         "A"          =>
+         "0A"         =>
+         "deadbeef"   =>
+         "3g"         =not=>
+         "waffle"     =not=>
+         "2.0"        =not=>)
+         
 
-(deftest test-with-base
-         (are [x f] (= (with-base 16 x) f)
-              "F" 15.
-              "FF" 255.
-              "f" 15.
-              "ff" 255.))
+(tabular "Proper processing of numbers"
+  (fact (through-stack (process-num ?str)) => ?num)
+  ?str  ?num
+  "3"   3.0
+  "1.5" 1.5
+  ".5"  0.5)
+
+(tabular "Proper processing of numbers"
+         (fact (with-base 16 ?str) => ?num)
+         ?str  ?num
+         "F"   15.
+         "FF"  255.
+         "f"   15.
+         "ff"  255.)
