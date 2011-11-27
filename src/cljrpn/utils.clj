@@ -19,7 +19,9 @@
 
 (defmacro maybe-let [tst bindings & body]
   "Bindings is a vector of vectors of the form [v t f] where
-  v is the symbol to be bound t is the true value and f the false value.
+  v is the symbol to be bound,
+  t is the true value,
+  and f the false value.
   Produces a let block where each symbol will be bound to it's true value
   if tst is true at execution time and else be bound to the false value."
   (let [new-bindings
