@@ -24,3 +24,25 @@
 (fact "Should produce stack effect when given a vector for help"
       (let [built-op (build-op :+ + ["x y" "x + y"] 2)]
         (:help (second built-op)) => "(STACK EFFECT) [... x y ] -> [... x + y ]"))
+
+(fact "Apply-op"
+      (apply-op '(1 2) + 2) => '(3)
+      (apply-op '(1) + 2) => falsey)
+
+(tabular "Argument counting"
+         (fact (process-op ?stack ?op) => ?result)
+         ?stack     ?op   ?result
+         '(1 2)     "+"   '(3)
+         '(1 2 3 4) "sum" '(10)
+         '(1 2 3 4) "prod" '(24))
+
+(tabular "Arithmetic behavior"
+         (fact (process-op ?stack ?op) => ?result)
+         ?stack   ?op   ?result
+         '(1 2 4) "+"   '(3 4)
+         '(1 2 4) "-"   '(1 4)
+         '(1 2 4) "*"   '(2 4)
+         '(1 2 4) "/"   '(2 4)
+         '(1 2 4) "neg" '(-1 2 4)
+         '(2 2 3) "^"   '(4 3))
+

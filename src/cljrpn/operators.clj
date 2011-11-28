@@ -1,8 +1,7 @@
 (ns cljrpn.operators
   "Implements the operations of the calculator."
-  (:use [cljrpn.stack :only [apply-op]]
-        [cljrpn.utils]
-        [cljrpn.math])
+  (:use cljrpn.utils
+        cljrpn.math)
   (:use [clojure.string :only [join]])
   (:require [clojure.math.numeric-tower :as math]))
 
@@ -88,11 +87,21 @@
   "Determine if the string _o_ represents a valid operator"
   (contains? op-table (keyword o)))
 
-(defn process-op [o]
+(defn apply-op [stack op n]
+  "Apply the function op to the top n members of the stack."
+  (cond
+    (< n 0)
+      (list (apply op (reverse stack)))
+    (>= (count stack) n)
+      (let [args (take n stack)]
+        (cons (apply op (reverse args)) (drop n stack)))))
+
+(defn process-op [stack o]
   "Apply the operator represented by o"
   (let [{:keys [op arity]} (op-table (keyword o))]
     (try
-      (if-not (apply-op op arity)
+      (if-let [stack (apply-op stack op arity)]
+        stack
         (println "Too few numbers on stack for operator: " o))
-      (catch AssertionError e
-        (println "Precondition for" o "not met.")))))
+    (catch AssertionError e
+      (println "Precondition for" o "not met.")))))

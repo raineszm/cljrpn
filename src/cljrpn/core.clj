@@ -44,24 +44,29 @@
   (print-prompt prompt)
   (if-let [line (read-line)] (.toLowerCase line)))
 
-(defn process-token [tok]
+(defn process-token [stack tok]
   "Handle one token of input."
-  (cond
-    @*last-mod* (trigger-mod tok)
-    (modifier? tok) (process-mod tok)
-    (num? tok) (process-num tok)
-    (operator? tok) (process-op tok)
-    (cmd? tok) (process-cmd tok)
+  (or
+    (cond
+    @*last-mod* (trigger-mod stack tok)
+    (modifier? tok) (process-mod stack tok)
+    (num? tok) (process-num stack tok)
+    (operator? tok) (process-op stack tok)
+    (cmd? tok) (process-cmd stack tok)
     :else (println (str "Unrecognized command: " tok) 
-                  "For help try: ?")))
+                  "For help try: ?"))
+    stack))
 
-(defn process-line [line]
+(defn process-line [stack line]
   "Handle one line of input from the user. Input is split on white space and each \"word\" ithen processed as a token."
-  (let [tokens (s/split line #"\s+")]
-    (doseq [tok tokens]
-      (process-token tok)))
-  (trigger-mod))
-
+  (loop [stack stack
+         tokens (s/split line #"\s+")]
+    (if (empty? tokens)
+      (trigger-mod stack)
+      (recur
+        (process-token stack (first tokens))
+        (rest tokens)))))
+    
 
 (defn- greeting []
   "Display the startup header."
@@ -71,12 +76,12 @@
   "The big show. The options hash is here to allow for an rc file in future versions."
   (let [prompt (or (:prompt options) *prompt*)]
     (greeting)
-    (loop [line (get-line prompt)]
+    (loop [main-stack '()
+           line (get-line prompt) ]
       (if (nil? line)
         0
-        (do
-          (process-line line)
-          (recur (get-line prompt))))))
+        (recur (process-line main-stack line)
+               (get-line prompt)))))
   (println "Exiting..."))
 
 (defn -main [& args]

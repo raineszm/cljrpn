@@ -1,31 +1,36 @@
 (ns cljrpn.commands
   "Provides commands to the user which take no arguments such as quit"
-  (:use [cljrpn.stack])
   (:use [cljrpn.utils]))
 
-(defn stack-pop []
+(defn stack-pop [stack]
   "Pop a value from the stack and print it"
-  (if-let [top (popf)]
+  (if-let [top (first stack)]
+    (do
       (println top)
-      (println "The stack is empty...")))
+      (rest stack))
+    (println "The stack is empty...")))
 
-(defn stack-show []
+(defn stack-show [stack]
   "Print the entire contents of the main stack."
-  (let [size (stack-size)]
+  (let [size (count stack)]
     (println "STACK:")
     (println "(TOP)")
     (doseq [i (range size)]
-        (println i ": " (nth @*main-stack* i)))))
+        (println i ": " (nth stack i)))))
 
-(defn dup []
+(defn dup [stack]
   "Duplicate the top of the stack"
-  (if-let [bot (peek @*main-stack*)]
-    (pushf bot)))
+  (if-let [bot (peek stack)]
+    (conj stack bot)))
 
-(defn swap []
+(defn swap [stack]
   "Swap the top two values on the stack"
-  (when (>= (stack-size) 2)
-    (apply pushf (popf 2))))
+  (when (>= (count stack) 2)
+    (concat (reverse (take 2 stack)) (drop 2 stack))))
+
+(defn clear-stack [stack]
+  "Clears the stack."
+  '())
 
 (defn build-cmd [kwargs cmd help]
   "Takes a list of the form [kwargs cmd help] and expands this into a collection of entries for the command table. Kwargs is a list of keywords which should be intrepreted as this supplied command, cmd is a command to be run, and help is the appropriate help text."
@@ -54,7 +59,7 @@
   "Determine if the string _o_ names a valid command."
   (contains? cmd-table (keyword o)))
 
-(defn process-cmd [o]
+(defn process-cmd [stack o]
   "Handle one command frome the user"
-  ((-> (keyword o) cmd-table :cmd)))
+  ((-> (keyword o) cmd-table :cmd) stack))
 
