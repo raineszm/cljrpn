@@ -4,11 +4,11 @@
 
 (fact "Should build an entry for the operator map from a operator spec"
       (build-op :+ + "+" 2) =>
-
-      [:+ {:op +
-           :help "+"
-           :arity 2
-           :cmds [:+]}])
+      (just
+        [:+ {:op +
+             :help "+"
+             :arity 2
+             :cmds [:+]}]))
 
 (fact "Should build multiple entries when first argument of spec is a vector"
       (build-op [:+ :plus] + "+" 2) =>

@@ -20,7 +20,6 @@
         (factorial ?n) => (throws AssertionError))
   ?n -1 4.2 -4.2)
 
-
 (fact (mean 1 2 3 4 5) => 3)
 
 (fact (variance 1 2 3 4 5) => 11)
