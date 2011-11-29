@@ -12,7 +12,8 @@
       (clear-stack '(1 2 3 4)) => '())
 
 (fact "Pop modifies the stack"
-      (stack-pop '(1 2 3 4)) => '(2 3 4))
+      (with-out-str
+        (stack-pop '(1 2 3 4)) => '(2 3 4)))
 
 (fact "Pop returns the top of the stack"
       (with-out-str

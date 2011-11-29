@@ -2,6 +2,8 @@
   (:use cljrpn.core)
   (:use midje.sweet))
 
+(fact "Commands are triggered by process token"
+      (process-token '(1 2) "clear") => '())
 
 (fact "Numbers are relayed by process-token"
       (process-token '() "1") => '(1.))
