@@ -32,6 +32,9 @@
   "Clears the stack."
   '())
 
+(defn quit [stack]
+  (System/exit 0))
+
 (defn build-cmd [kwargs cmd help]
   "Takes a list of the form [kwargs cmd help] and expands this into a collection of entries for the command table. Kwargs is a list of keywords which should be intrepreted as this supplied command, cmd is a command to be run, and help is the appropriate help text."
   (let [kwargs (as-vec kwargs)]
@@ -53,7 +56,7 @@
     [:dup dup (effect "a" "a a")]
     [:swap swap (effect "a b" "b a")]
     [[:clear :.c] clear-stack "Empties the stack"]
-    [[:q :quit :.q] (fn [stack] (System/exit 0)) "Exits the program"]))
+    [[:q :quit :.q] quit "Exits the program"]))
 
 (defn cmd? [o]
   "Determine if the string _o_ names a valid command."
