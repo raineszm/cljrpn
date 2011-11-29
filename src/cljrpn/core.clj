@@ -2,7 +2,6 @@
   (:use [cljrpn.commands :only [cmd? process-cmd]]
         [cljrpn.operators :only [operator? process-op]]
         [cljrpn.numbers :only [num? process-num]]
-        [cljrpn.stack :only [stack-size]]
         [cljrpn.modifiers :only [*last-mod* modifier? process-mod trigger-mod]]
         [clojure.tools.cli])
   (:require [clojure.string :as s])
@@ -24,24 +23,25 @@
   "Substitutions is a list of the form (pattern1 f1 pattern2 f2...)
   produces a method which replaces each supplied pattern in a string
   with the result of calling the corresponding function."
-  (let [subst (apply hash-map substitutions) ]
-  `(fn [string#]
+  (let [subst (apply hash-map substitutions)
+        stack-var (gensym)]
+  `(fn [~stack-var string#]
     (-> string# ~@(map (fn [[pat f]]
-                            `(s/replace ~pat (str (~f))))
+                            `(s/replace ~pat (str (~f ~stack-var))))
                           subst)))))
 
 (def fill-in
   (filter-proc
-    ":SIZE:" stack-size))
+    ":SIZE:" count))
 
-(defn print-prompt [prompt]
+(defn print-prompt [stack prompt]
   "Prints the prompt. A new-line is not appended."
-  (print (fill-in prompt))
+  (print (fill-in stack prompt))
   (flush))
 
-(defn- get-line [prompt]
+(defn- get-line [stack prompt]
   "Prompts the user and returns the input as a lowercase string."
-  (print-prompt prompt)
+  (print-prompt stack prompt)
   (if-let [line (read-line)] (.toLowerCase line)))
 
 (defn process-token [stack tok]
@@ -77,11 +77,12 @@
   (let [prompt (or (:prompt options) *prompt*)]
     (greeting)
     (loop [main-stack '()
-           line (get-line prompt) ]
+           line (get-line main-stack prompt) ]
       (if (nil? line)
         0
-        (recur (process-line main-stack line)
-               (get-line prompt)))))
+        (let [new-stack (process-line main-stack line)]
+          (recur new-stack
+                 (get-line new-stack prompt))))))
   (println "Exiting..."))
 
 (defn -main [& args]
