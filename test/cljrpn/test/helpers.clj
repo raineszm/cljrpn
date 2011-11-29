@@ -1,9 +1,8 @@
 (ns cljrpn.test.helpers
   (:use cljrpn.state)
-  (:use midje.sweet)
-  (:import cljrpn.state.State))
+  (:use midje.sweet))
 
-(def t-empty-state (State. '()))
+(def t-empty-state (new-state '()))
 
 (defn stack-t [stack]
   (chatty-checker [state]

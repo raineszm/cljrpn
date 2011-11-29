@@ -2,7 +2,6 @@
   (:use cljrpn.numbers
         cljrpn.state
         midje.sweet)
-  (:import cljrpn.state.State)
   (:use cljrpn.test.helpers))
 
 (tabular "The finer points of number matching"
@@ -37,7 +36,7 @@
          ".5"  0.5)
 
 (fact "Numbers are added to the stack"
-      (process-num (State. '(1)) "2.5") => (stack-t '(2.5 1)))
+      (process-num (new-state '(1)) "2.5") => (stack-t '(2.5 1)))
 
 (tabular "Proper processing of numbers"
          (fact (with-base 16 ?str) => ?num)

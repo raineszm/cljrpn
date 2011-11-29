@@ -1,18 +1,17 @@
 (ns cljrpn.test.core
   (:use cljrpn.core
         cljrpn.state)
-  (:import cljrpn.state.State)
   (:use midje.sweet
         cljrpn.test.helpers))
 
 (fact "Commands are triggered by process token"
-      (process-token (State. '(1 2)) "clear") => (stack-t '()))
+      (process-token (new-state '(1 2)) "clear") => (stack-t '()))
 
 (fact "Numbers are relayed by process-token"
       (process-token t-empty-state "1") => (stack-t '(1.)))
 
 (fact "Operators are relayed by process-token"
-      (process-token (State. '(1 2)) "+") => (stack-t '(3)))
+      (process-token (new-state '(1 2)) "+") => (stack-t '(3)))
 
 (fact "Modifiers are triggered on following input."
       (process-line t-empty-state "x: A") => (stack-t '(10.)))

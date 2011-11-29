@@ -2,10 +2,9 @@
   (:use midje.sweet
         cljrpn.state
         cljrpn.commands)
-  (:import cljrpn.state.State)
   (:use cljrpn.test.helpers))
 
-(def state (State. '(1 2 3 4 )))
+(def state (new-state '(1 2 3 4 )))
 
 (fact "The swap command"
       (swap state) => (stack-t '(2 1 3 4)))

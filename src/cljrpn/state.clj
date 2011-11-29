@@ -1,6 +1,7 @@
 (ns cljrpn.state)
 
-(defrecord State [stack])
+(defn new-state [stack]
+  {:stack stack})
 
 (defn update-stack [state g]
   (update-in state [:stack] g))

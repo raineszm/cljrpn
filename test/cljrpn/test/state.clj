@@ -1,6 +1,5 @@
 (ns cljrpn.test.state
   (:use cljrpn.state)
-  (:import cljrpn.state.State)
   (:use cljrpn.test.helpers)
   (:use midje.sweet))
 
@@ -10,12 +9,12 @@
 (unfinished g)
 
 (fact "update-stack replace the stack"
-  (update-stack (State. '()) g) => (contains {:stack '(4)})
+  (update-stack (new-state '()) g) => (contains {:stack '(4)})
   (provided
     (g anything) => '(4)))
 
 (fact "top fetches the top of the stack"
-  (top (State. '(1 2 3))) => 1)
+  (top (new-state '(1 2 3))) => 1)
 
 (fact "popf removes the top of the stack"
-  (popf (State. '(1 2 3))) => (contains {:stack '(2 3)}))
+  (popf (new-state '(1 2 3))) => (contains {:stack '(2 3)}))

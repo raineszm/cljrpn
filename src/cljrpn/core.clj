@@ -6,7 +6,6 @@
         cljrpn.state
         [clojure.tools.cli])
   (:require [clojure.string :as s])
-  (:import cljrpn.state.State)
   (:gen-class))
 
 (def cljrpn-version
@@ -78,7 +77,7 @@
   "The big show. The options hash is here to allow for an rc file in future versions."
   (let [prompt (or (:prompt options) *prompt*)]
     (greeting)
-    (loop [main-state (State. '())
+    (loop [main-state (new-state '())
            line (get-line main-state prompt) ]
       (if (nil? line)
         0
