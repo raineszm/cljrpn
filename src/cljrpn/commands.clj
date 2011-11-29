@@ -53,7 +53,7 @@
     [:dup dup (effect "a" "a a")]
     [:swap swap (effect "a b" "b a")]
     [[:clear :.c] clear-stack "Empties the stack"]
-    [[:q :quit :.q] #(System/exit 0) "Exits the program"]))
+    [[:q :quit :.q] (fn [stack] (System/exit 0)) "Exits the program"]))
 
 (defn cmd? [o]
   "Determine if the string _o_ names a valid command."
