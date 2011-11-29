@@ -34,7 +34,7 @@
 
 (def fill-in
   (filter-proc
-    ":SIZE:" #(-> :stack count)))
+    ":SIZE:" #(-> % :stack count)))
 
 (defn print-prompt [state prompt]
   "Prints the prompt. A new-line is not appended."

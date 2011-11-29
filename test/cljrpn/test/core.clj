@@ -18,7 +18,7 @@
       (process-line t-empty-state "x: A") => (stack-t '(10.)))
 
 (tabular "Basic arithmetic"
-         (fact (process-line '() ?line) => (stack-t '(?val)))
+         (fact (process-line t-empty-state ?line) => (stack-t '(?val)))
          ?line      ?val
          "1 2 +" 3.0
          "2 3 *" 6.0

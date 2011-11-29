@@ -29,8 +29,8 @@
         (:help (second built-op)) => "(STACK EFFECT) [... x y ] -> [... x + y ]"))
 
 (fact "Apply-op"
-      (apply-op '(1 2) + 2) => '(3)
-      (apply-op '(1) + 2) => falsey)
+      (apply-op (State. '(1 2)) + 2) => (stack-t '(3))
+      (apply-op (State. '(1)) + 2) => falsey)
 
 (tabular "Argument counting"
          (fact (process-op (State. ?stack) ?op) => (stack-t ?result))

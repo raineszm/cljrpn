@@ -4,6 +4,7 @@
         [cljrpn.numbers :only [hex? binary? with-base]]
         [cljrpn.registers :only [set-register get-register register? used-registers]]
         [cljrpn.utils]
+        cljrpn.state
         [clojure.string :only [replace-first]]))
 
 
@@ -20,7 +21,7 @@
 (declare modifier?)
 
 (defn help
-  ([stack]
+  ([state]
    (doseq [[title hsh]
          [["Operators: " op-table]
            ["Commands: " cmd-table]
@@ -28,37 +29,37 @@
      (print title)
      (apply println (map name (sort (keys hsh))))
      (newline)))
-  ([stack sym]
+  ([state sym]
    (cond
      (operator? sym) (print-help op-table sym)
      (cmd? sym) (print-help cmd-table sym)
      (modifier? sym) (print-help mod-table sym))))
 
 (defn store
-  ([stack ]
+  ([state ]
    (println "Register not specified."))
-  ([stack r]
+  ([state r]
    (if (register? r)
      (do 
-       (set-register r (first stack))
-       (rest stack))
+       (set-register r (top state))
+       (popf state))
      (println r " is not a register."))))
 
 (defn retrieve
-  ([stack]
+  ([state]
    (println "Register not specified."))
-  ([stack r]
+  ([state r]
    (if (register? r)
      (if-let [v (get-register r)]
-       (conj stack v))
+       (pushf state v))
      (println r " is not a register."))))
 
 (defn register-show
-  ([stack]
+  ([state]
    (let [regs (used-registers)]
      (doseq [[reg v] regs]
        (println (name reg) " <- " v))))
-  ([stack r]
+  ([state r]
    (if (register? r)
      (println r " <- " (get-register r))
      (println r " is not a valid register"))))
@@ -67,12 +68,12 @@
   (let [type-name (replace-first (str pred) "?" "")]
     [ code
      `(fn
-       ([stack# ]
+       ([state# ]
         (println "Incomplete specifiction for " ~code))
-       ([stack# sym#]
+       ([state# sym#]
         (if-not (~pred sym#)
           (println "Malformed command " ~code " " sym#)
-          (conj stack# (with-base ~base sym#)))))
+          (pushf state# (with-base ~base sym#)))))
      (str "Interprets the next literal as a " type-name " integer")]))
 
 (def ^:dynamic *last-mod* (atom nil))
@@ -98,18 +99,18 @@
 (defn modifier? [m]
   (contains? mod-table (keyword m)))
 
-(defn process-mod [stack m]
+(defn process-mod [state m]
   (reset! *last-mod* (-> (keyword m) mod-table :cmd))
-  stack)
+  state)
 
 (defn trigger-mod
-  ([stack]
+  ([state]
    (if @*last-mod*
-     (let [stack (@*last-mod* stack)]
+     (let [state (@*last-mod* state)]
        (reset! *last-mod* nil)
-       stack)
-     stack))
-  ([stack sym]
-   (let [new-stack (@*last-mod* stack sym)]
+       state)
+     state))
+  ([state sym]
+   (let [new-state (@*last-mod* state sym)]
      (reset! *last-mod* nil)
-     (or new-stack stack))))
+     (or new-state state))))
