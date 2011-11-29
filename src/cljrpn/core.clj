@@ -3,8 +3,10 @@
         [cljrpn.operators :only [operator? process-op]]
         [cljrpn.numbers :only [num? process-num]]
         [cljrpn.modifiers :only [*last-mod* modifier? process-mod trigger-mod]]
+        cljrpn.state
         [clojure.tools.cli])
   (:require [clojure.string :as s])
+  (:import cljrpn.state.State)
   (:gen-class))
 
 (def cljrpn-version
@@ -24,47 +26,47 @@
   produces a method which replaces each supplied pattern in a string
   with the result of calling the corresponding function."
   (let [subst (apply hash-map substitutions)
-        stack-var (gensym)]
-  `(fn [~stack-var string#]
+        state-var (gensym)]
+  `(fn [~state-var string#]
     (-> string# ~@(map (fn [[pat f]]
-                            `(s/replace ~pat (str (~f ~stack-var))))
+                            `(s/replace ~pat (str (~f ~state-var))))
                           subst)))))
 
 (def fill-in
   (filter-proc
-    ":SIZE:" count))
+    ":SIZE:" #(-> :stack count)))
 
-(defn print-prompt [stack prompt]
+(defn print-prompt [state prompt]
   "Prints the prompt. A new-line is not appended."
-  (print (fill-in stack prompt))
+  (print (fill-in state prompt))
   (flush))
 
-(defn- get-line [stack prompt]
+(defn- get-line [state prompt]
   "Prompts the user and returns the input as a lowercase string."
-  (print-prompt stack prompt)
+  (print-prompt state prompt)
   (if-let [line (read-line)] (.toLowerCase line)))
 
-(defn process-token [stack tok]
+(defn process-token [state tok]
   "Handle one token of input."
   (or
     (cond
-    @*last-mod* (trigger-mod stack tok)
-    (modifier? tok) (process-mod stack tok)
-    (num? tok) (process-num stack tok)
-    (operator? tok) (process-op stack tok)
-    (cmd? tok) (process-cmd stack tok)
+    @*last-mod* (trigger-mod state tok)
+    (modifier? tok) (process-mod state tok)
+    (num? tok) (process-num state tok)
+    (operator? tok) (process-op state tok)
+    (cmd? tok) (process-cmd state tok)
     :else (println (str "Unrecognized command: " tok) 
                   "For help try: ?"))
-    stack))
+    state))
 
-(defn process-line [stack line]
+(defn process-line [state line]
   "Handle one line of input from the user. Input is split on white space and each \"word\" ithen processed as a token."
-  (loop [stack stack
+  (loop [state state
          tokens (s/split line #"\s+")]
     (if (empty? tokens)
-      (trigger-mod stack)
+      (trigger-mod state)
       (recur
-        (process-token stack (first tokens))
+        (process-token state (first tokens))
         (rest tokens)))))
     
 
@@ -76,13 +78,13 @@
   "The big show. The options hash is here to allow for an rc file in future versions."
   (let [prompt (or (:prompt options) *prompt*)]
     (greeting)
-    (loop [main-stack '()
-           line (get-line main-stack prompt) ]
+    (loop [main-state (State. '())
+           line (get-line main-state prompt) ]
       (if (nil? line)
         0
-        (let [new-stack (process-line main-stack line)]
-          (recur new-stack
-                 (get-line new-stack prompt))))))
+        (let [new-state (process-line main-state line)]
+          (recur new-state
+                 (get-line new-state prompt))))))
   (println "Exiting..."))
 
 (defn -main [& args]

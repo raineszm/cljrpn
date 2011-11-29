@@ -1,6 +1,9 @@
 (ns cljrpn.test.numbers
   (:use cljrpn.numbers
-        midje.sweet))
+        cljrpn.state
+        midje.sweet)
+  (:import cljrpn.state.State)
+  (:use cljrpn.test.helpers))
 
 (tabular "The finer points of number matching"
          (fact ?number => num?)
@@ -27,14 +30,14 @@
          
 
 (tabular "Proper processing of numbers"
-         (fact (process-num '() ?str) => (contains ?num))
+         (fact (process-num t-empty-state ?str) => (stack-t '(?num)))
          ?str  ?num
          "3"   3.0
          "1.5" 1.5
          ".5"  0.5)
 
 (fact "Numbers are added to the stack"
-      (process-num '(1) "2.5") => '(2.5 1))
+      (process-num (State. '(1)) "2.5") => (stack-t '(2.5 1)))
 
 (tabular "Proper processing of numbers"
          (fact (with-base 16 ?str) => ?num)

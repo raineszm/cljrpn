@@ -1,21 +1,24 @@
 (ns cljrpn.test.core
-  (:use cljrpn.core)
-  (:use midje.sweet))
+  (:use cljrpn.core
+        cljrpn.state)
+  (:import cljrpn.state.State)
+  (:use midje.sweet
+        cljrpn.test.helpers))
 
 (fact "Commands are triggered by process token"
-      (process-token '(1 2) "clear") => '())
+      (process-token (State. '(1 2)) "clear") => (stack-t '()))
 
 (fact "Numbers are relayed by process-token"
-      (process-token '() "1") => '(1.))
+      (process-token t-empty-state "1") => (stack-t '(1.)))
 
 (fact "Operators are relayed by process-token"
-      (process-token '(1 2) "+") => '(3))
+      (process-token (State. '(1 2)) "+") => (stack-t '(3)))
 
 (fact "Modifiers are triggered on following input."
-      (process-line '() "x: A") => '(10.))
+      (process-line t-empty-state "x: A") => (stack-t '(10.)))
 
 (tabular "Basic arithmetic"
-         (fact (process-line '() ?line) => (has-prefix ?val))
+         (fact (process-line '() ?line) => (stack-t '(?val)))
          ?line      ?val
          "1 2 +" 3.0
          "2 3 *" 6.0

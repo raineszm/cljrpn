@@ -1,6 +1,9 @@
 (ns cljrpn.test.operators
   (:use cljrpn.operators
-        midje.sweet))
+        cljrpn.state
+        cljrpn.test.helpers
+        midje.sweet)
+  (:import cljrpn.state.State))
 
 (fact "Should build an entry for the operator map from a operator spec"
       (build-op :+ + "+" 2) =>
@@ -30,14 +33,14 @@
       (apply-op '(1) + 2) => falsey)
 
 (tabular "Argument counting"
-         (fact (process-op ?stack ?op) => ?result)
+         (fact (process-op (State. ?stack) ?op) => (stack-t ?result))
          ?stack     ?op   ?result
          '(1 2)     "+"   '(3)
          '(1 2 3 4) "sum" '(10)
          '(1 2 3 4) "prod" '(24))
 
 (tabular "Arithmetic behavior"
-         (fact (process-op ?stack ?op) => ?result)
+         (fact (process-op (State. ?stack) ?op) => (stack-t ?result))
          ?stack   ?op   ?result
          '(1 2 4) "+"   '(3 4)
          '(1 2 4) "-"   '(1 4)

@@ -1,38 +1,43 @@
 (ns cljrpn.commands
   "Provides commands to the user which take no arguments such as quit"
-  (:use [cljrpn.utils]))
+  (:use [cljrpn.utils]
+        cljrpn.state))
 
-(defn stack-pop [stack]
+(defn stack-pop [state]
   "Pop a value from the stack and print it"
-  (if-let [top (first stack)]
+  (if-let [top' (top state)]
     (do
-      (println top)
-      (rest stack))
+      (println top')
+      (popf state))
     (println "The stack is empty...")))
 
-(defn stack-show [stack]
+(defn stack-show [state]
   "Print the entire contents of the main stack."
-  (let [size (count stack)]
+  (let [stack (:stack state)
+        size (count stack)]
     (println "STACK:")
     (println "(TOP)")
     (doseq [i (range size)]
         (println i ": " (nth stack i)))))
 
-(defn dup [stack]
+(defn dup [state]
   "Duplicate the top of the stack"
-  (if-let [bot (peek stack)]
-    (conj stack bot)))
+  (if-let [top' (top state)]
+    (pushf state top')))
 
-(defn swap [stack]
+(defn swap [state]
   "Swap the top two values on the stack"
-  (when (>= (count stack) 2)
-    (concat (reverse (take 2 stack)) (drop 2 stack))))
+  (let [stack (:stack state)]
+    (when (>= (count stack) 2)
+      (assoc state
+             :stack
+             (concat (reverse (take 2 stack)) (drop 2 stack))))))
 
-(defn clear-stack [stack]
+(defn clear-stack [state]
   "Clears the stack."
-  '())
+  (assoc state :stack '()))
 
-(defn quit [stack]
+(defn quit [state]
   (System/exit 0))
 
 (defn build-cmd [kwargs cmd help]
@@ -62,7 +67,7 @@
   "Determine if the string _o_ names a valid command."
   (contains? cmd-table (keyword o)))
 
-(defn process-cmd [stack o]
+(defn process-cmd [state o]
   "Handle one command frome the user"
-  ((-> (keyword o) cmd-table :cmd) stack))
+  ((-> (keyword o) cmd-table :cmd) state))
 

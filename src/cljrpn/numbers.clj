@@ -1,13 +1,14 @@
 (ns cljrpn.numbers
-  "Tools for parsing numerical input.")
+  "Tools for parsing numerical input."
+  (:use cljrpn.state))
 
 (defn num? [tok]
   "Determines if the string tok represents a valid decimal number"
   (re-matches #"-?((\d+\.?\d*)|(\d*\.?\d+))(e-?\d+)?" tok))
 
-(defn process-num [stack tok]
+(defn process-num [state tok]
   "Parses a number and pushes it to the stack"
-  (conj stack (Float/parseFloat tok)))
+  (pushf state (Float/parseFloat tok)))
 
 (defn binary? [tok]
   "Determines if the string tok represents a binary number"
