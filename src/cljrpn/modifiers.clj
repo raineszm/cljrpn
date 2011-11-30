@@ -40,9 +40,7 @@
    (println "Register not specified."))
   ([state r]
    (if (register? r)
-     (do 
-       (set-register state r (top state))
-       (popf state))
+       (popf (set-register state r (top state)))
      (println r " is not a register."))))
 
 (defn retrieve

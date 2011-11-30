@@ -16,6 +16,10 @@
 (fact "Modifiers are triggered on following input."
       (process-line t-empty-state "x: A") => (stack-t '(10.)))
 
+(fact "Contents of registers are listed"
+      (with-out-str (process-line t-empty-state "3 -> a .r"))
+      => (contains "3"))
+
 (tabular "Basic arithmetic"
          (fact (process-line t-empty-state ?line) => (stack-t '(?val)))
          ?line      ?val

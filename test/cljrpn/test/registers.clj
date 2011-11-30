@@ -12,4 +12,8 @@
        (assoc-in t-empty-state
                   [:registers :a] 3)
         "a") => 3)
-      
+
+(fact "Used-registers returns those registers which are set"
+       (used-registers
+        (assoc-in t-empty-state
+                  [:registers :a] 3)) => (contains [[:a 3]]))
