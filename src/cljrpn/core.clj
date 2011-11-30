@@ -2,7 +2,7 @@
   (:use [cljrpn.commands :only [cmd? process-cmd]]
         [cljrpn.operators :only [operator? process-op]]
         [cljrpn.numbers :only [num? process-num]]
-        [cljrpn.modifiers :only [*last-mod* modifier? process-mod trigger-mod]]
+        [cljrpn.modifiers :only [modifier? process-mod trigger-mod]]
         cljrpn.state
         [clojure.tools.cli])
   (:require [clojure.string :as s])
@@ -49,7 +49,7 @@
   "Handle one token of input."
   (or
     (cond
-    @*last-mod* (trigger-mod state tok)
+    (:last-mod state) (trigger-mod state tok)
     (modifier? tok) (process-mod state tok)
     (num? tok) (process-num state tok)
     (operator? tok) (process-op state tok)

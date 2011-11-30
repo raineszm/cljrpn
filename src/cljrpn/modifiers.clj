@@ -76,8 +76,6 @@
           (pushf state# (with-base ~base sym#)))))
      (str "Interprets the next literal as a " type-name " integer")]))
 
-(def ^:dynamic *last-mod* (atom nil))
-
 (def mod-table
   (construct build-cmd
              [[:? :h :help] help
@@ -100,17 +98,14 @@
   (contains? mod-table (keyword m)))
 
 (defn process-mod [state m]
-  (reset! *last-mod* (-> (keyword m) mod-table :cmd))
-  state)
+  (assoc state :last-mod (-> (keyword m) mod-table :cmd)))
 
 (defn trigger-mod
   ([state]
-   (if @*last-mod*
-     (let [state (@*last-mod* state)]
-       (reset! *last-mod* nil)
-       state)
+   (if-let [last-mod (:last-mod state)]
+     (let [state (or (last-mod state) state)]
+       (assoc state :last-mod nil))
      state))
   ([state sym]
-   (let [new-state (@*last-mod* state sym)]
-     (reset! *last-mod* nil)
-     (or new-state state))))
+   (let [state (or ((:last-mod state) state sym) state)]
+     (assoc state :last-mod nil))))
