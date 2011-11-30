@@ -1,20 +1,18 @@
 (ns cljrpn.registers
   "Contains the code for handling single value registers")
 
-(def ^:dynamic *registers* (atom {}))
-
 (defn register? [r]
   "Determine whether the provided string is a valid register name"
   (re-matches #"\p{Alpha}" r))
 
-(defn set-register [k v]
+(defn set-register [state k v]
   "Set the register named k to the value v"
-  (swap! *registers* assoc (keyword k) v))
+  (assoc-in state [:registers (keyword k)] v))
 
-(defn get-register [k]
+(defn get-register [state k]
   "Get the contents of the register named k"
-  ((keyword k) @*registers*))
+  (get-in state [:registers (keyword k)]))
 
-(defn used-registers []
+(defn used-registers [state]
   "Return a list of of register name (as keywords) with non nil values"
-  (sort (filter val @*registers*)))
+  (sort (filter val (:registers state))))

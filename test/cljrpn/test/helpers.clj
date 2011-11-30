@@ -7,3 +7,7 @@
 (defn stack-t [stack]
   (chatty-checker [state]
                   ((contains {:stack stack}) state)))
+
+(defn register-t [reg value]
+  (chatty-checker [state]
+                  ((contains {reg value}) (:registers state))))

@@ -36,12 +36,12 @@
      (modifier? sym) (print-help mod-table sym))))
 
 (defn store
-  ([state ]
+  ([state]
    (println "Register not specified."))
   ([state r]
    (if (register? r)
      (do 
-       (set-register r (top state))
+       (set-register state r (top state))
        (popf state))
      (println r " is not a register."))))
 
@@ -50,18 +50,18 @@
    (println "Register not specified."))
   ([state r]
    (if (register? r)
-     (if-let [v (get-register r)]
+     (if-let [v (get-register state r)]
        (pushf state v))
      (println r " is not a register."))))
 
 (defn register-show
   ([state]
-   (let [regs (used-registers)]
+   (let [regs (used-registers state)]
      (doseq [[reg v] regs]
        (println (name reg) " <- " v))))
   ([state r]
    (if (register? r)
-     (println r " <- " (get-register r))
+     (println r " <- " (get-register state r))
      (println r " is not a valid register"))))
 
 (defmacro literal [code pred base]
