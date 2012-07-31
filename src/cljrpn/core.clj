@@ -17,7 +17,7 @@
 (def
   ^:dynamic
   *prompt*
-  "The command prompt. Substitutions are done via fill-in. In the future this should be configuratble by the user."
+  "The command prompt. Substitutions are done via fill-in. In the future this should be configurable by the user."
   "cljrpn[s::SIZE:]> ")
 
 (defmacro filter-proc [& substitutions]
@@ -59,7 +59,7 @@
     state))
 
 (defn process-line [state line]
-  "Handle one line of input from the user. Input is split on white space and each \"word\" ithen processed as a token."
+  "Handle one line of input from the user. Input is split on white space and each \"word\" is then processed as a token."
   (loop [state state
          tokens (s/split line #"\s+")]
     (if (empty? tokens)
@@ -96,6 +96,6 @@
           ["-h" "--help" "Display this help dialog" :default false :flag true])]
     (cond
       (:help flags) (println banner)
-      (:execute flags) (process-line (:execute flags))
+      (:execute flags) (and (process-line (new-state '()) (:execute flags)) nil)
       (:version flags) (print-version)
       :else (main-loop {}))))
