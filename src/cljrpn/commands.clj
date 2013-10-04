@@ -1,10 +1,10 @@
 (ns cljrpn.commands
-  "Provides commands to the user which take no arguments such as quit"
+  "Provides commands to the user which take no arguments, such as quit"
   (:use [cljrpn.utils]
         cljrpn.state))
 
 (defn stack-pop [state]
-  "Pop a value from the stack and print it"
+  "Pop a value from the stack and print it. Returns the updated state."
   (if-let [top' (top state)]
     (do
       (println top')
@@ -12,7 +12,7 @@
     (println "The stack is empty...")))
 
 (defn stack-show [state]
-  "Print the entire contents of the main stack."
+  "Print the entire contents of the main stack. Returns nil"
   (let [stack (:stack state)
         size (count stack)]
     (println "STACK:")
@@ -21,12 +21,12 @@
         (println i ": " (nth stack i)))))
 
 (defn dup [state]
-  "Duplicate the top of the stack"
+  "Duplicate the top of the stack. Returns the updated state"
   (if-let [top' (top state)]
     (pushf state top')))
 
 (defn swap [state]
-  "Swap the top two values on the stack"
+  "Swap the top two values on the stack. Returns the updated state."
   (let [stack (:stack state)]
     (when (>= (count stack) 2)
       (assoc state
@@ -38,10 +38,14 @@
   (assoc state :stack '()))
 
 (defn quit [state]
+  "Terminates the program."
   (System/exit 0))
 
 (defn build-cmd [kwargs cmd help]
-  "Takes a list of the form [kwargs cmd help] and expands this into a collection of entries for the command table. Kwargs is a list of keywords which should be intrepreted as this supplied command, cmd is a command to be run, and help is the appropriate help text."
+  "Expands the arguments into a collection of entries for the command table. 
+  _kwargs_ is a list of keywords which should be intrepreted as this supplied command
+  _cmd_ is a command to be run. Commands should take a state as their only argument and return an updated state (or nil if the state has not changed).
+  _help_ is the appropriate help text."
   (let [kwargs (as-vec kwargs)]
     (mapcat
       (fn [kw]

@@ -26,9 +26,19 @@
   with the result of calling the corresponding function."
   (let [subst (apply hash-map substitutions)
         state-var (gensym)]
+    ;create a new function which takes a string and the state object
   `(fn [~state-var string#]
-    (-> string# ~@(map (fn [[pat f]]
-                            `(s/replace ~pat (str (~f ~state-var))))
+     ;iteratively replace the given patterns in the string by the result
+     ;of running the corresponding function on the state object
+    (-> string# ~@(map 
+                    ;generate the following function
+                    (fn [[pat f]]
+                            ;replace each pattern 'pat' in the list
+                            `(s/replace ~pat
+                                       ;with the result of calling f on the
+                                        ;state var 
+                                        (str (~f ~state-var))))
+                    ;for each pair in the list substitutions
                           subst)))))
 
 (def fill-in

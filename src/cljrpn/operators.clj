@@ -6,16 +6,24 @@
   (:use [clojure.string :only [join]])
   (:require [clojure.math.numeric-tower :as math]))
 
-(defn build-op 
-  "Parses vector DSL provided to produce entries for the op-table map"
-  ([kwargs op help arity]
+(defn build-op [kwargs op help arity]
+  "Parses vector DSL provided to produce entries for the op-table map.
+
+  Our DSL is as follows. We use a 4 element vector to construct operators. It consists of:
+
+  kwargs - a symbol/string or a vector of symbols/strings which give the tokens that will be used for this command in the program.
+  op - a function implementing the operation. It takes __arity__ floating point numbers and returns a floating point number
+  help - the help text for the operator
+  arity - the number of arguments that this operator accepts. -1 indicates an unlimited number of arguments.
+  
+  Returns a list of vectors of the form [:kwarg operator-map]"
    (let [kwargs (as-vec kwargs)
          help (if (vector? help) (apply effect help) help)]
      (mapcat (fn [kw]
                [(keyword kw) { :op op,
                               :help help
                               :arity arity
-                              :cmds kwargs}]) kwargs))))
+                              :cmds kwargs}]) kwargs)))
 
 (defn java-math-help [name arity]
   "Generate appropriate arguments for the help string builder for a method provided via java interop"
@@ -23,8 +31,7 @@
     [(join " " args) (str name "(" (join ", " args) ")")]))
 
 (defmacro java-math [fn-name & [frst & rst :as more]]
-  "Produce a DSL vector entry for operators using a method from the 
-  java Math class"
+  "Produce a DSL vector entry  as suitable for build-op for operators using a method from the java Math class"
   ;maybe-let is provided by cljrpn.utils
   (maybe-let (number? frst)
             [[arity
@@ -32,18 +39,24 @@
              [more
               rst more]]
             (let [fn-name-str (str fn-name)
+                  ;gather up the java name and any provided alternatives
                   aliases (conj (vec more) (.toLowerCase fn-name-str))
                   arg-names (repeatedly arity gensym)]
-              `[~aliases (fn ~(vec arg-names) (. Math ~fn-name ~@arg-names))
-                ~(java-math-help fn-name-str arity) ~arity])))
+              ;create the DSL entry for __build-op__
+              `[~aliases 
+                (fn ~(vec arg-names) 
+                  (. Math ~fn-name ~@arg-names))
+                ~(java-math-help fn-name-str arity) 
+                ~arity])))
 
 (def
   op-table
-  "A map of the available operators. Each entry is itself a map with entries:
-  :op function corresponding the opreator
+  "A map of the available operators of the form {..., :op-name => entry}. Each entry is itself a map with entries:
+  :op function corresponding the operator
   :help the help text for the operator
   :arity the number of arguments required for the operator
   :cmds a list of inputs which correspond to this operator"
+  ;construct is provided by cljrpn.utils
   (construct build-op
              [:+ + ["x y" "x + y"] 2]
              [:- - ["x y" "x - y"] 2]
@@ -89,7 +102,7 @@
   (contains? op-table (keyword o)))
 
 (defn apply-op [state op n]
-  "Apply the function op to the top n members of the stack."
+  "Apply the function _op_ to the top _n_ members of the stack. Returns the updated state."
   (let [stack (:stack state)]
     (if-let [new-stack 
              (cond
@@ -101,7 +114,7 @@
       (assoc state :stack new-stack))))
 
 (defn process-op [state o]
-  "Apply the operator represented by o"
+  "Apply the operator represented by _o_. Returns the updated state."
   (let [{:keys [op arity]} (op-table (keyword o))]
     (try
       (if-let [state (apply-op state op arity)]

@@ -1,4 +1,5 @@
-(ns cljrpn.utils)
+(ns cljrpn.utils
+  "Help functions and macros used to simplify the code of this project")
 
 (defn as-vec [x]
   "Converts x to a vector by introducing the minimally needed degree of nesting."
@@ -8,8 +9,7 @@
     :else (vector x)))
 
 (defmacro construct [builder & specs]
-  "Used to build a map of data specified as a list of vectors. builder is applied
-  to each spec vector in order to produce the resultant entries."
+  "Used to build a map of data specified as a list of vectors. builder is applied to each spec vector in order to produce the resultant entries."
   `(apply hash-map
     (mapcat #(apply ~builder %) (list ~@specs))))
 
@@ -22,7 +22,7 @@
   v is the symbol to be bound,
   t is the true value,
   and f the false value.
-  Produces a let block where each symbol will be bound to it's true value
+  Produces a let block where each symbol will be bound to its true value
   if tst is true at execution time and else be bound to the false value."
   (let [new-bindings
         (mapcat (fn [[v t f]]

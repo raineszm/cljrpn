@@ -6,11 +6,11 @@
   (re-matches #"\p{Alpha}" r))
 
 (defn set-register [state k v]
-  "Set the register named k to the value v"
+  "Set the register named _k_ to the value _v_"
   (assoc-in state [:registers (keyword k)] v))
 
 (defn get-register [state k]
-  "Get the contents of the register named k"
+  "Get the contents of the register named _k_"
   (get-in state [:registers (keyword k)]))
 
 (defn used-registers [state]

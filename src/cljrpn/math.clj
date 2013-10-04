@@ -3,9 +3,11 @@
   (require [clojure.math.numeric-tower :as math]))
 
 (defn- lax-integer? [i]
+  "Helper method for factorial. Checks to see whether _i_ is an integer."
   (== i (Math/floor i)))
 
 (defn factorial [n]
+  ;we require that _n_ is a non-negative integer
   {:pre [(lax-integer? n) (not (neg? n))]}
   "Return the factorial of n"
   (loop [n n
@@ -15,16 +17,19 @@
       (recur (dec n) (* acc n)))))
 
 (defn mean [& args]
+  "Calculated the arithmetic mean of _args"
   (let [n (count args)]
     (if (pos? n)
       (/ (apply + args) n))))
 
 (defn variance [& args]
+  "Computes the variance of _args_"
   (let [n (count args)]
     (if (pos? n)
       (/ (apply + (map #(* % %) args)) n))))
 
 (defn stddev [& args]
+  "Returns the standard deviation of _args_"
   (if-let [s2 (apply variance args)]
     (math/sqrt s2)))
 

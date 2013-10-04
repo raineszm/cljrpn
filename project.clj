@@ -5,4 +5,5 @@
                  [org.clojure/math.numeric-tower "0.0.2"]
                  [midje "1.6-beta1"]]
   :checksum-deps true
-  :main cljrpn.core)
+  :main cljrpn.core
+  :aot [cljrpn.core])
