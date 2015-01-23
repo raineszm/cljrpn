@@ -3,7 +3,7 @@
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/tools.cli "0.3.1"]
                  [org.clojure/math.numeric-tower "0.0.4"]]
-  :profiles {:dev {:dependencies [[midje "1.6.3"]]}}
+  :profiles {:uberjar {:aot :all},
+             :dev {:dependencies [[midje "1.6.3"]]}}
   :checksum-deps true
-  :main cljrpn.core
-  :aot [cljrpn.core])
+  :main cljrpn.core)
