@@ -2,7 +2,7 @@
   "Implements the operations of the calculator."
   (:require
         [cljrpn.utils :refer [as-vec construct effect maybe-let]]
-        [cljrpn.state :refer [popf]]
+        [cljrpn.state :refer [popf pushf update-stack stack-size top]]
         [clojure.string :refer [join]]
         [cljrpn.math :refer :all]
         [clojure.math.numeric-tower :as math]))
@@ -21,7 +21,7 @@
    (let [kwargs (as-vec kwargs)
          help (if (vector? help) (apply effect help) help)]
      (mapcat (fn [kw]
-               [(keyword kw) { :op op,
+               [(keyword kw) {:op op,
                               :help help
                               :arity arity
                               :cmds kwargs}]) kwargs)))
@@ -34,6 +34,8 @@
 (defmacro java-math [fn-name & [frst & rst :as more]]
   "Produce a DSL vector entry  as suitable for build-op for operators using a method from the java Math class"
   ;maybe-let is provided by cljrpn.utils
+  ; This tests to see whether the arity of the function was provided
+  ; if not, it is assumed be unary
   (maybe-let (number? frst)
             [[arity
               frst 1]
@@ -104,15 +106,18 @@
 
 (defn apply-op [state op n]
   "Apply the function _op_ to the top _n_ members of the stack. Returns the updated state."
-  (let [stack (:stack state)]
-    (if-let [new-stack
-             (cond
-               (< n 0)
-                 (list (apply op (reverse stack)))
-               (>= (count stack) n)
-                 (let [args (take n stack)]
-                   (cons (apply op (reverse args)) (drop n stack))))]
-      (assoc state :stack new-stack))))
+  (cond
+    ; arity < 0 means we operate on the whole stack
+    (< n 0)
+      (update-stack state
+                    (comp list #(apply op %) reverse))
+    ; otherwise check to make sure we have enough elements
+    (>= (stack-size state) n)
+      (let [args (top state n)]
+        (pushf
+          (popf state n)
+          (apply op (reverse args))))))
+
 
 (defn process-op [state o]
   "Apply the operator represented by _o_. Returns the updated state."
