@@ -1,6 +1,6 @@
 (ns cljrpn.numbers
   "Tools for parsing numerical input."
-  (:use cljrpn.state))
+  (:require [cljrpn.state :refer [pushf]]))
 
 (defn num? [tok]
   "Determines if the string _tok_ represents a valid decimal number"

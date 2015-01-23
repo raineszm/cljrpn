@@ -1,7 +1,7 @@
 (ns cljrpn.commands
   "Provides commands to the user which take no arguments, such as quit"
-  (:use [cljrpn.utils]
-        cljrpn.state))
+  (:require [cljrpn.utils :refer [as-vec construct effect]]
+        [cljrpn.state :refer [pushf popf top]]))
 
 (defn stack-pop [state]
   "Pop a value from the stack and print it. Returns the updated state."
@@ -42,7 +42,7 @@
   (System/exit 0))
 
 (defn build-cmd [kwargs cmd help]
-  "Expands the arguments into a collection of entries for the command table. 
+  "Expands the arguments into a collection of entries for the command table.
   _kwargs_ is a list of keywords which should be intrepreted as this supplied command
   _cmd_ is a command to be run. Commands should take a state as their only argument and return an updated state (or nil if the state has not changed).
   _help_ is the appropriate help text."

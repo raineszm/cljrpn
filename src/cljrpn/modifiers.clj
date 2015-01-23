@@ -1,12 +1,12 @@
 (ns cljrpn.modifiers
   "Operations which modify the behavior of the next token to be parsed"
-  (:use [cljrpn.operators :only [op-table operator?]]
-        [cljrpn.commands :only [cmd-table cmd? build-cmd]]
-        [cljrpn.numbers :only [hex? binary? with-base]]
-        [cljrpn.registers :only [set-register get-register register? used-registers]]
-        [cljrpn.utils]
-        cljrpn.state
-        [clojure.string :only [replace-first]]))
+  (:require [cljrpn.operators :refer [op-table operator?]]
+        [cljrpn.commands :refer [cmd-table cmd? build-cmd]]
+        [cljrpn.numbers :refer [hex? binary? with-base]]
+        [cljrpn.registers :refer [set-register get-register register? used-registers]]
+        [cljrpn.utils :refer [construct effect]]
+        [cljrpn.state :refer [pushf popf top]]
+        [clojure.string :refer [replace-first]]))
 
 
 (declare mod-table)
@@ -88,16 +88,16 @@
               (str "When called with an argument displays help"
                    " information about that command. Otherwise, "
                    "displays a command list.")]
-             ["->" store 
+             ["->" store
               (str "Stores the top value of the stack to the register "
                    "specified as the following token. Registers are a-z")]
-             ["<-" retrieve 
+             ["<-" retrieve
               (str "Pushes the register "
                    "specified as the following token to the stack. Registers are a-z")]
-             [".r" register-show 
+             [".r" register-show
               (str "Prints the contents of "
                    "register specified as the following token. Register are a-z")]
-             (literal "x:" hex? 16) 
+             (literal "x:" hex? 16)
              (literal "b:" binary? 2)))
 
 (defn modifier? [m]

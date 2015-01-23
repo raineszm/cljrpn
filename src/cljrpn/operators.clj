@@ -1,10 +1,11 @@
 (ns cljrpn.operators
   "Implements the operations of the calculator."
-  (:use cljrpn.utils
-        cljrpn.math
-        cljrpn.state)
-  (:use [clojure.string :only [join]])
-  (:require [clojure.math.numeric-tower :as math]))
+  (:require
+        [cljrpn.utils :refer [as-vec construct effect maybe-let]]
+        [cljrpn.state :refer [popf]]
+        [clojure.string :refer [join]]
+        [cljrpn.math :refer :all]
+        [clojure.math.numeric-tower :as math]))
 
 (defn build-op [kwargs op help arity]
   "Parses vector DSL provided to produce entries for the op-table map.
@@ -15,7 +16,7 @@
   op - a function implementing the operation. It takes __arity__ floating point numbers and returns a floating point number
   help - the help text for the operator
   arity - the number of arguments that this operator accepts. -1 indicates an unlimited number of arguments.
-  
+
   Returns a list of vectors of the form [:kwarg operator-map]"
    (let [kwargs (as-vec kwargs)
          help (if (vector? help) (apply effect help) help)]
@@ -43,10 +44,10 @@
                   aliases (conj (vec more) (.toLowerCase fn-name-str))
                   arg-names (repeatedly arity gensym)]
               ;create the DSL entry for __build-op__
-              `[~aliases 
-                (fn ~(vec arg-names) 
+              `[~aliases
+                (fn ~(vec arg-names)
                   (. Math ~fn-name ~@arg-names))
-                ~(java-math-help fn-name-str arity) 
+                ~(java-math-help fn-name-str arity)
                 ~arity])))
 
 (def
@@ -83,7 +84,7 @@
              (java-math sin "s")
              (java-math cos "c")
              (java-math tan "t")
-             (java-math asin) 
+             (java-math asin)
              (java-math acos)
              (java-math atan)
              (java-math cosh "ch")
@@ -96,7 +97,7 @@
              (java-math toRadians "rad")
              [:e #(Math/E) "Pushes the constant e to the stack" 0]
              [:pi #(Math/PI) "Pushes the constant pi to the stack" 0]))
-                
+
 (defn operator? [o]
   "Determine if the string _o_ represents a valid operator"
   (contains? op-table (keyword o)))
@@ -104,7 +105,7 @@
 (defn apply-op [state op n]
   "Apply the function _op_ to the top _n_ members of the stack. Returns the updated state."
   (let [stack (:stack state)]
-    (if-let [new-stack 
+    (if-let [new-stack
              (cond
                (< n 0)
                  (list (apply op (reverse stack)))

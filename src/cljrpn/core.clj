@@ -1,11 +1,11 @@
 (ns cljrpn.core
-  (:use [cljrpn.commands :only [cmd? process-cmd]]
-        [cljrpn.operators :only [operator? process-op]]
-        [cljrpn.numbers :only [num? process-num]]
-        [cljrpn.modifiers :only [modifier? process-mod trigger-mod]]
-        cljrpn.state
-        [clojure.tools.cli])
-  (:require [clojure.string :as s])
+  (:require [cljrpn.commands :refer [cmd? process-cmd]]
+        [cljrpn.operators :refer [operator? process-op]]
+        [cljrpn.numbers :refer [num? process-num]]
+        [cljrpn.modifiers :refer [modifier? process-mod trigger-mod]]
+        [cljrpn.state :refer [new-state]]
+        [clojure.tools.cli :refer :all]
+        [clojure.string :as s])
   (:gen-class))
 
 (def cljrpn-version
@@ -30,13 +30,13 @@
   `(fn [~state-var string#]
      ;iteratively replace the given patterns in the string by the result
      ;of running the corresponding function on the state object
-    (-> string# ~@(map 
+    (-> string# ~@(map
                     ;generate the following function
                     (fn [[pat f]]
                             ;replace each pattern 'pat' in the list
                             `(s/replace ~pat
                                        ;with the result of calling f on the
-                                        ;state var 
+                                        ;state var
                                         (str (~f ~state-var))))
                     ;for each pair in the list substitutions
                           subst)))))
@@ -64,7 +64,7 @@
     (num? tok) (process-num state tok)
     (operator? tok) (process-op state tok)
     (cmd? tok) (process-cmd state tok)
-    :else (println (str "Unrecognized command: " tok) 
+    :else (println (str "Unrecognized command: " tok)
                   "For help try: ?"))
     state))
 
@@ -77,7 +77,7 @@
       (recur
         (process-token state (first tokens))
         (rest tokens)))))
-    
+
 
 (defn- greeting []
   "Display the startup header."
