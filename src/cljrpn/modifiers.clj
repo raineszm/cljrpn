@@ -11,8 +11,9 @@
 
 (declare mod-table)
 
-(defn print-help [table sym]
+(defn print-help
   "Display the help entry for _sym_ from command table _table_"
+  [table sym]
   (let [op ((keyword sym) table)
         aliases (:cmds op)
         effect (:help op)]
@@ -68,8 +69,9 @@
      (println r " <- " (get-register state r))
      (println r " is not a valid register"))))
 
-(defmacro literal [code pred base]
+(defmacro literal
   "Returns a DSL entry to generate a command which will interpret the next literal in a particular base."
+  [code pred base]
   (let [type-name (replace-first (str pred) "?" "")]
     [ code
      `(fn
@@ -100,12 +102,14 @@
              (literal "x:" hex? 16)
              (literal "b:" binary? 2)))
 
-(defn modifier? [m]
+(defn modifier?
   "Determines whether the token _m_ defines a valid modifier command."
+  [m]
   (contains? mod-table (keyword m)))
 
-(defn process-mod [state m]
+(defn process-mod
   "Arms the modifier _m_ so that it can process the next read token"
+  [state m]
   (assoc state :last-mod (-> (keyword m) mod-table :cmd)))
 
 (defn trigger-mod

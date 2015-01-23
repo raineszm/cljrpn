@@ -1,16 +1,19 @@
 (ns cljrpn.state
   "Defines the state object which determines the state of the program and provides simple tools to modify it")
 
-(defn new-state [stack]
+(defn new-state
   "Creates a minimal state wrapping _stack_"
+  [stack]
   {:stack stack})
 
-(defmacro update-stack [state g & args]
+(defmacro update-stack
   "Appies _g_ to the current stack and updates _state_ with generated stack"
+  [state g & args]
   `(update-in ~state [:stack] ~g ~@args))
 
-(defn pushf [state f]
+(defn pushf
   "Push _f_ to the top of the stack"
+  [state f]
   (assoc state :stack (cons f (:stack state))))
 
 (defn top

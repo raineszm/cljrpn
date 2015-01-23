@@ -1,13 +1,12 @@
 (ns cljrpn.operators
   "Implements the operations of the calculator."
-  (:require
-        [cljrpn.utils :refer [as-vec construct effect maybe-let]]
-        [cljrpn.state :refer [popf pushf update-stack stack-size top]]
-        [clojure.string :refer [join]]
-        [cljrpn.math :refer :all]
-        [clojure.math.numeric-tower :as math]))
+  (:require [cljrpn.math :refer :all]
+            [cljrpn.state :refer [popf pushf stack-size top update-stack]]
+            [cljrpn.utils :refer [as-vec construct effect maybe-let]]
+            [clojure.math.numeric-tower :as math]
+            [clojure.string :refer [join]]))
 
-(defn build-op [kwargs op help arity]
+(defn build-op
   "Parses vector DSL provided to produce entries for the op-table map.
 
   Our DSL is as follows. We use a 4 element vector to construct operators. It consists of:
@@ -18,6 +17,7 @@
   arity - the number of arguments that this operator accepts. -1 indicates an unlimited number of arguments.
 
   Returns a list of vectors of the form [:kwarg operator-map]"
+ [kwargs op help arity]
    (let [kwargs (as-vec kwargs)
          help (if (vector? help) (apply effect help) help)]
      (mapcat (fn [kw]
@@ -26,13 +26,15 @@
                               :arity arity
                               :cmds kwargs}]) kwargs)))
 
-(defn java-math-help [name arity]
+(defn java-math-help
   "Generate appropriate arguments for the help string builder for a method provided via java interop"
+  [name arity]
   (let [args (map #(str "x" %) (range arity))]
     [(join " " args) (str name "(" (join ", " args) ")")]))
 
-(defmacro java-math [fn-name & [frst & rst :as more]]
+(defmacro java-math
   "Produce a DSL vector entry  as suitable for build-op for operators using a method from the java Math class"
+  [fn-name & [frst & rst :as more]]
   ;maybe-let is provided by cljrpn.utils
   ; This tests to see whether the arity of the function was provided
   ; if not, it is assumed be unary
@@ -65,7 +67,7 @@
              [:- - ["x y" "x - y"] 2]
              [:* * ["x y" "x * y"] 2]
              ["/" / ["x y" "x / y"] 2]
-             [:neg #(- %) ["x" "-x"] 1]
+             [:neg - ["x" "-x"] 1]
              [["^" "**"] math/expt ["x y" "x**y"] 2]
              [["abs" "||"] math/abs ["x" "|x|"] 1]
              [["!" "fact"] factorial ["n" "n!"] 1]
@@ -100,15 +102,17 @@
              [:e #(Math/E) "Pushes the constant e to the stack" 0]
              [:pi #(Math/PI) "Pushes the constant pi to the stack" 0]))
 
-(defn operator? [o]
+(defn operator?
   "Determine if the string _o_ represents a valid operator"
+  [o]
   (contains? op-table (keyword o)))
 
-(defn apply-op [state op n]
+(defn apply-op
   "Apply the function _op_ to the top _n_ members of the stack. Returns the updated state."
+  [state op n]
   (cond
     ; arity < 0 means we operate on the whole stack
-    (< n 0)
+    (neg? n)
       (update-stack state
                     (comp list #(apply op %) reverse))
     ; otherwise check to make sure we have enough elements
@@ -119,8 +123,9 @@
           (apply op (reverse args))))))
 
 
-(defn process-op [state o]
+(defn process-op
   "Apply the operator represented by _o_. Returns the updated state."
+  [state o]
   (let [{:keys [op arity]} (op-table (keyword o))]
     (try
       (if-let [state (apply-op state op arity)]

@@ -20,10 +20,11 @@
   "The command prompt. Substitutions are done via fill-in. In the future this should be configurable by the user."
   "cljrpn[s::SIZE:]> ")
 
-(defmacro filter-proc [& substitutions]
+(defmacro filter-proc
   "Substitutions is a list of the form (pattern1 f1 pattern2 f2...)
   produces a method which replaces each supplied pattern in a string
   with the result of calling the corresponding function."
+  [& substitutions]
   (let [subst (apply hash-map substitutions)
         state-var (gensym)]
     ;create a new function which takes a string and the state object
@@ -45,18 +46,21 @@
   (filter-proc
     ":SIZE:" stack-size))
 
-(defn print-prompt [state prompt]
+(defn print-prompt
   "Prints the prompt. A new-line is not appended."
+  [state prompt]
   (print (fill-in state prompt))
   (flush))
 
-(defn- get-line [state prompt]
+(defn- get-line
   "Prompts the user and returns the input as a lowercase string."
+  [state prompt]
   (print-prompt state prompt)
   (if-let [line (read-line)] (.toLowerCase line)))
 
-(defn process-token [state tok]
+(defn process-token
   "Handle one token of input."
+  [state tok]
   (or
     (cond
     (:last-mod state) (trigger-mod state tok)
@@ -68,8 +72,9 @@
                   "For help try: ?"))
     state))
 
-(defn process-line [state line]
+(defn process-line
   "Handle one line of input from the user. Input is split on white space and each \"word\" is then processed as a token."
+  [state line]
   (loop [state state
          tokens (s/split line #"\s+")]
     (if (empty? tokens)
@@ -79,12 +84,14 @@
         (rest tokens)))))
 
 
-(defn- greeting []
+(defn- greeting
   "Display the startup header."
+  []
   (print-version))
 
-(defn main-loop [options]
+(defn main-loop
   "The big show. The options hash is here to allow for an rc file in future versions."
+  [options]
   (let [prompt (or (:prompt options) *prompt*)]
     (greeting)
     (loop [main-state (new-state '())
