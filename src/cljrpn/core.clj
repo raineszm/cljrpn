@@ -3,7 +3,7 @@
         [cljrpn.operators :refer [operator? process-op]]
         [cljrpn.numbers :refer [num? process-num]]
         [cljrpn.modifiers :refer [modifier? process-mod trigger-mod]]
-        [cljrpn.state :refer [new-state]]
+        [cljrpn.state :refer [new-state stack-size]]
         [clojure.tools.cli :refer :all]
         [clojure.string :as s])
   (:gen-class))
@@ -43,7 +43,7 @@
 
 (def fill-in
   (filter-proc
-    ":SIZE:" #(-> % :stack count)))
+    ":SIZE:" stack-size))
 
 (defn print-prompt [state prompt]
   "Prints the prompt. A new-line is not appended."
