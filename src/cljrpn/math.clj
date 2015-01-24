@@ -9,9 +9,9 @@
 
 (defn factorial
   ;we require that _n_ is a non-negative integer
-  {:pre [(lax-integer? n) (not (neg? n))]}
   "Return the factorial of n"
   [n]
+  {:pre [(lax-integer? n) (not (neg? n))]}
   (loop [n n
          acc 1]
     (if (<= n 1)
