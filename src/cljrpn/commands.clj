@@ -1,7 +1,7 @@
 (ns cljrpn.commands
   "Provides commands to the user which take no arguments, such as quit"
-  (:require [cljrpn.utils :refer [as-vec construct effect]]
-        [cljrpn.state :refer [pushf popf top]]))
+  (:require [cljrpn.state :refer [popf pushf stack-size top update-stack]]
+            [cljrpn.utils :refer [as-vec construct effect]]))
 
 (defn stack-pop
   "Pop a value from the stack and print it. Returns the updated state."
@@ -25,17 +25,15 @@
 (defn dup
   "Duplicate the top of the stack. Returns the updated state"
   [state]
-  (if-let [top' (top state)]
-    (pushf state top')))
+  (some->> (top state) (pushf state)))
 
 (defn swap
   "Swap the top two values on the stack. Returns the updated state."
   [state]
-  (let [stack (:stack state)]
-    (when (>= (count stack) 2)
-      (assoc state
-             :stack
-             (concat (reverse (take 2 stack)) (drop 2 stack))))))
+  (when (>= (stack-size state) 2)
+    (update-stack
+      state
+      (fn [[x y & more]] (conj more x y)))))
 
 (defn clear-stack
   "Clears the stack."
@@ -82,5 +80,5 @@
 (defn process-cmd
   "Handle one command frome the user"
   [state o]
-  ((-> (keyword o) cmd-table :cmd) state))
+  ((get-in cmd-table [(keyword o) :cmd]) state))
 
