@@ -30,14 +30,15 @@
          [["Operators: " op-table]
            ["Commands: " cmd-table]
            ["Modifiers: " mod-table]]]
-     (print title)
-     (apply println (map name (sort (keys hsh))))
+    (print title)
+     (->> hsh keys sort (map name) (apply println))
      (newline)))
   ([state sym]
-   (cond
-     (operator? sym) (print-help op-table sym)
-     (cmd? sym) (print-help cmd-table sym)
-     (modifier? sym) (print-help mod-table sym))))
+   (if-let [table (cond
+                    (operator? sym) op-table
+                    (cmd? sym) cmd-table
+                    (modifier? sym) mod-table)]
+     (print-help table sym))))
 
 (defn store
   "Store the top of the stack to the register _r_"
@@ -73,9 +74,11 @@
   "Returns a DSL entry to generate a command which will interpret the next literal in a particular base."
   [code pred base]
   (let [type-name (replace-first (str pred) "?" "")]
-    [ code
+    [code ;Prefix which can be used within the program
+     ;;v The function which will parse the following symbol
+     ;; in the proper base vvvvv
      `(fn
-       ([state# ]
+       ([state#]
         (println "Incomplete specifiction for " ~code))
        ([state# sym#]
         ;check to see if _sym#_ is a valid literal of base _base_
@@ -110,15 +113,12 @@
 (defn process-mod
   "Arms the modifier _m_ so that it can process the next read token"
   [state m]
-  (assoc state :last-mod (-> (keyword m) mod-table :cmd)))
+  (assoc state :last-mod (get-in mod-table [(keyword m) :cmd])))
 
 (defn trigger-mod
   "Triggers the currently armed modifier (if any). If no token is available a fallback mode is executed, otherwise the modifier consumes the token."
-  ([state]
+  [state & sym]
    (if-let [last-mod (:last-mod state)]
-     (let [state (or (last-mod state) state)]
-       (assoc state :last-mod nil))
+     (assoc (or (apply last-mod state sym) state)
+            :last-mod nil)
      state))
-  ([state sym]
-   (let [state (or ((:last-mod state) state sym) state)]
-     (assoc state :last-mod nil))))

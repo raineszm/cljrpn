@@ -68,7 +68,7 @@
     (num? tok) (process-num state tok)
     (operator? tok) (process-op state tok)
     (cmd? tok) (process-cmd state tok)
-    :else (println (str "Unrecognized command: " tok)
+    :else (println "Unrecognized command: " tok
                   "For help try: ?"))
     state))
 
