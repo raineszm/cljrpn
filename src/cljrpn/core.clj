@@ -3,7 +3,7 @@
             [cljrpn.modifiers :refer [modifier? process-mod trigger-mod]]
             [cljrpn.numbers :refer [num? process-num]]
             [cljrpn.operators :refer [operator? process-op]]
-            [cljrpn.options :refer [load-config-safe]]
+            [cljrpn.options :refer [get-config]]
             [cljrpn.state :refer [new-state stack-size top]]
             [clojure.string :as s]
             [clojure.tools.cli :refer :all])
@@ -107,13 +107,12 @@
         ; Parse our command line arguments
         (cli
           args
-          ["-e" "--execute" "Execute the supplied commands and then exit" :default nil]
+          ["-e" "--execute CODE" "Execute the supplied commands and then exit" :default nil]
           ["-v" "--version" "Print the version string" :default false :flag true]
           ["-h" "--help" "Display this help dialog" :default false :flag true]
-          ["-c" "--config" "Path to a config file to use (edn format)" :default nil])]
+          ["-c" "--config CONFIG-FILE" "Path to a config file to use (edn format)" :default nil])]
     (cond
       (:help flags) (println banner)
       (:execute flags) (and (process-line (new-state '()) (:execute flags)) nil)
       (:version flags) (print-version)
-      (:config flags) (main-loop (load-config-safe (:config flags)))
-      :else (main-loop (load-config-safe)))))
+      :else (main-loop (get-config (:config flags))))))
