@@ -1,11 +1,12 @@
 (ns cljrpn.core
   (:require [cljrpn.commands :refer [cmd? process-cmd]]
-        [cljrpn.operators :refer [operator? process-op]]
-        [cljrpn.numbers :refer [num? process-num]]
-        [cljrpn.modifiers :refer [modifier? process-mod trigger-mod]]
-        [cljrpn.state :refer [new-state stack-size]]
-        [clojure.tools.cli :refer :all]
-        [clojure.string :as s])
+            [cljrpn.modifiers :refer [modifier? process-mod trigger-mod]]
+            [cljrpn.numbers :refer [num? process-num]]
+            [cljrpn.operators :refer [operator? process-op]]
+            [cljrpn.options :refer [load-config-safe]]
+            [cljrpn.state :refer [new-state stack-size top]]
+            [clojure.string :as s]
+            [clojure.tools.cli :refer :all])
   (:gen-class))
 
 (def cljrpn-version
@@ -28,23 +29,22 @@
   (let [subst (apply hash-map substitutions)
         state-var (gensym)]
     ;create a new function which takes a string and the state object
-  `(fn [~state-var string#]
-     ;iteratively replace the given patterns in the string by the result
-     ;of running the corresponding function on the state object
-    (-> string# ~@(map
-                    ;generate the following function
-                    (fn [[pat f]]
-                            ;replace each pattern 'pat' in the list
-                            `(s/replace ~pat
-                                       ;with the result of calling f on the
-                                        ;state var
-                                        (str (~f ~state-var))))
-                    ;for each pair in the list substitutions
-                          subst)))))
+    `(fn [~state-var string#]
+       ;iteratively replace the given patterns in the string by the result
+       ;of running the corresponding function on the state object
+       (-> string# ~@(map
+                       (fn [[pat f]]
+                         ;replace each pattern 'pat' in the list
+                         ;with the result of calling f on the
+                         ;state var
+                         `(s/replace ~pat (str (~f ~state-var))))
+                       ;for each pair in the list substitutions
+                       subst)))))
 
 (def fill-in
   (filter-proc
-    ":SIZE:" stack-size))
+    ":SIZE:" stack-size
+    ":TOP:" top))
 
 (defn print-prompt
   "Prints the prompt. A new-line is not appended."
@@ -96,8 +96,7 @@
     (greeting)
     (loop [main-state (new-state '())
            line (get-line main-state prompt) ]
-      (if (nil? line)
-        0
+      (when line
         (let [new-state (process-line main-state line)]
           (recur new-state
                  (get-line new-state prompt))))))
@@ -110,9 +109,11 @@
           args
           ["-e" "--execute" "Execute the supplied commands and then exit" :default nil]
           ["-v" "--version" "Print the version string" :default false :flag true]
-          ["-h" "--help" "Display this help dialog" :default false :flag true])]
+          ["-h" "--help" "Display this help dialog" :default false :flag true]
+          ["-c" "--config" "Path to a config file to use (edn format)" :default nil])]
     (cond
       (:help flags) (println banner)
       (:execute flags) (and (process-line (new-state '()) (:execute flags)) nil)
       (:version flags) (print-version)
-      :else (main-loop {}))))
+      (:config flags) (main-loop (load-config-safe (:config flags)))
+      :else (main-loop (load-config-safe)))))
