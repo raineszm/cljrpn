@@ -3,7 +3,7 @@
             [cljrpn.modifiers :refer [modifier? process-mod trigger-mod]]
             [cljrpn.numbers :refer [num? process-num]]
             [cljrpn.operators :refer [operator? process-op]]
-            [cljrpn.options :refer [get-config]]
+            [cljrpn.options :refer [get-config defaults]]
             [cljrpn.state :refer [new-state stack-size top]]
             [clojure.string :as s]
             [clojure.tools.cli :refer :all])
@@ -14,12 +14,6 @@
 
 (defn print-version []
   (println "cljrpn version" cljrpn-version "by Zach Raines"))
-
-(def
-  ^:dynamic
-  *prompt*
-  "The command prompt. Substitutions are done via fill-in. In the future this should be configurable by the user."
-  "cljrpn[s::SIZE:]> ")
 
 (defmacro filter-proc
   "Substitutions is a list of the form (pattern1 f1 pattern2 f2...)
@@ -92,7 +86,7 @@
 (defn main-loop
   "The big show. The options hash is here to allow for an rc file in future versions."
   [options]
-  (let [prompt (or (:prompt options) *prompt*)]
+  (let [prompt (:prompt options)]
     (greeting)
     (loop [main-state (new-state '())
            line (get-line main-state prompt) ]
@@ -115,4 +109,7 @@
       (:help flags) (println banner)
       (:execute flags) (and (process-line (new-state '()) (:execute flags)) nil)
       (:version flags) (print-version)
-      :else (main-loop (get-config (:config flags))))))
+      :else (main-loop
+              (merge
+                (get-config (:config flags))
+                defaults)))))

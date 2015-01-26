@@ -1,0 +1,4 @@
+{
+ ;; The command prompt. Substitutions are done via fill-in. In the future this should be configurable by the user.
+ :prompt "cljrpn[s::SIZE:]> "
+ }
