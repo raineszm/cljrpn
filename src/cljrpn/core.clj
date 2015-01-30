@@ -57,13 +57,13 @@
   [state tok]
   (or
     (cond
-    (:last-mod state) (trigger-mod state tok)
-    (modifier? tok) (process-mod state tok)
-    (num? tok) (process-num state tok)
-    (operator? tok) (process-op state tok)
-    (cmd? tok) (process-cmd state tok)
-    :else (println "Unrecognized command: " tok
-                  "For help try: ?"))
+      (:last-mod state) (trigger-mod state tok)
+      (modifier? tok) (process-mod state tok)
+      (num? tok) (process-num state tok)
+      (operator? tok) (process-op state tok)
+      (cmd? tok) (process-cmd state tok)
+      :else (println "Unrecognized command: " tok
+                     "For help try: ?"))
     state))
 
 (defn process-line
@@ -72,6 +72,8 @@
   (loop [state state
          tokens (s/split line #"\s+")]
     (if (empty? tokens)
+      ; When we reach the end of the line
+      ; trigger any dangling modifiers
       (trigger-mod state)
       (recur
         (process-token state (first tokens))
