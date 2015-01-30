@@ -5,15 +5,15 @@
         midje.sweet))
 
 (fact "Registers can be set"
-      (set-register t-empty-state "a" 3) => (register-t :a 3))
+      (set-register t-empty-state "a" ..val..) => (register-t :a ..val..))
 
 (fact "Registers can be retrived"
       (get-register
        (assoc-in t-empty-state
-                  [:registers :a] 3)
-        "a") => 3)
+                  [:registers :a] ..val..)
+        "a") => ..val..)
 
 (fact "Used-registers returns those registers which are set"
        (used-registers
         (assoc-in t-empty-state
-                  [:registers :a] 3)) => (contains [[:a 3]]))
+                  [:registers :a] ..val..)) => (contains [[:a ..val..]]))

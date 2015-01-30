@@ -25,7 +25,8 @@
 
 (fact "Should produce stack effect when given a vector for help"
       (let [built-op (build-op :+ + ["x y" "x + y"] 2)]
-        (:help (second built-op)) => "(STACK EFFECT) [... x y ] -> [... x + y ]"))
+        (:help (second built-op))
+        => "(STACK EFFECT) [... x y ] -> [... x + y ]"))
 
 (fact "Apply-op"
       (apply-op (new-state '(1 2)) + 2) => (stack-t '(3))

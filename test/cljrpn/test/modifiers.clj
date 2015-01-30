@@ -9,10 +9,10 @@
   (set-register
     t-empty-state
     "a"
-    3))
+    ..val..))
 
 (fact "The store modifier places to top value of the stack into the specified register"
-      (store (new-state '(1)) "a") => (register-t :a 1))
+      (store (new-state '(..val..)) "a") => (register-t :a ..val..))
 
 (fact "The retrieve modifer pushes the requested register to the stack."
-      (retrieve t-state-w-registers "a") => (stack-t '(3)))
+      (retrieve t-state-w-registers "a") => (stack-t '(..val..)))
