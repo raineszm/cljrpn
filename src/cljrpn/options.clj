@@ -34,4 +34,4 @@
     (or (some load-config-file paths) {})))
 
 (def defaults
-  (-> "cljrpnrc" io/resource io/file slurp edn/read-string))
+  (-> "cljrpnrc" io/resource slurp edn/read-string))
