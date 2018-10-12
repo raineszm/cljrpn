@@ -6,6 +6,8 @@
                  [org.clojure/tools.reader "1.3.0"]]
   :resource-paths ["resources/"]
   :profiles {:uberjar {:aot :all},
-             :dev {:dependencies [[midje "1.9.3"]]}}
+             :dev {
+                   :dependencies [[midje "1.9.3"]]
+                   :plugins [[lein-midje "3.2.1"]]}}
   :checksum-deps true
   :main cljrpn.core)
