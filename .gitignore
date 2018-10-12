@@ -8,3 +8,4 @@ pom.xml
 tags
 target/*
 .lein-repl-history
+.direnv/*
