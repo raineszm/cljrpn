@@ -1,6 +1,6 @@
 (ns cljrpn.math
   "Provides math functions that could not be found in standard libraries"
-  (require [clojure.math.numeric-tower :as math]))
+  (:require [clojure.math.numeric-tower :as math]))
 
 (defn- lax-integer?
   "Helper method for factorial. Checks to see whether _i_ is an integer."
