@@ -18,7 +18,7 @@
 
 (defn load-config-file
   "Load a configuration file from the given path.
-  Files are in edm format."
+  Files are in edn format."
   [^String fpath]
   (let [f (io/file (expand-user fpath))]
     (when (.exists f)
@@ -29,8 +29,8 @@
   list of paths."
   [& custom-paths]
   (let [paths (concat
-                (remove nil? custom-paths)
-                config-paths)]
+               (remove nil? custom-paths)
+               config-paths)]
     (or (some load-config-file paths) {})))
 
 (def defaults

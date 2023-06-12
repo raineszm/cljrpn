@@ -27,18 +27,18 @@
        ;iteratively replace the given patterns in the string by the result
        ;of running the corresponding function on the state object
        (-> string# ~@(map
-                       (fn [[pat f]]
+                      (fn [[pat f]]
                          ;replace each pattern 'pat' in the list
                          ;with the result of calling f on the
                          ;state var
-                         `(s/replace ~pat (str (~f ~state-var))))
+                        `(s/replace ~pat (str (~f ~state-var))))
                        ;for each pair in the list substitutions
-                       subst)))))
+                      subst)))))
 
 (def fill-in
   (filter-proc
-    ":SIZE:" stack-size
-    ":TOP:" top))
+   ":SIZE:" stack-size
+   ":TOP:" top))
 
 (defn print-prompt
   "Prints the prompt. A new-line is not appended."
@@ -50,21 +50,21 @@
   "Prompts the user and returns the input as a lowercase string."
   [state prompt]
   (print-prompt state prompt)
-  (if-let [line (read-line)] (.toLowerCase line)))
+  (when-let [line (read-line)] (.toLowerCase line)))
 
 (defn process-token
   "Handle one token of input."
   [state tok]
   (or
-    (cond
-      (:last-mod state) (trigger-mod state tok)
-      (modifier? tok) (process-mod state tok)
-      (num? tok) (process-num state tok)
-      (operator? tok) (process-op state tok)
-      (cmd? tok) (process-cmd state tok)
-      :else (println "Unrecognized command: " tok
-                     "For help try: ?"))
-    state))
+   (cond
+     (:last-mod state) (trigger-mod state tok)
+     (modifier? tok) (process-mod state tok)
+     (num? tok) (process-num state tok)
+     (operator? tok) (process-op state tok)
+     (cmd? tok) (process-cmd state tok)
+     :else (println "Unrecognized command: " tok
+                    "For help try: ?"))
+   state))
 
 (defn process-line
   "Handle one line of input from the user. Input is split on white space and each \"word\" is then processed as a token."
@@ -76,9 +76,8 @@
       ; trigger any dangling modifiers
       (trigger-mod state)
       (recur
-        (process-token state (first tokens))
-        (rest tokens)))))
-
+       (process-token state (first tokens))
+       (rest tokens)))))
 
 (defn- greeting
   "Display the startup header."
@@ -91,7 +90,7 @@
   (let [prompt (:prompt options)]
     (greeting)
     (loop [main-state (new-state '())
-           line (get-line main-state prompt) ]
+           line (get-line main-state prompt)]
       (when line
         (let [new-state (process-line main-state line)]
           (recur new-state
@@ -102,16 +101,16 @@
   (let [[flags args banner]
         ; Parse our command line arguments
         (cli
-          args
-          ["-e" "--execute CODE" "Execute the supplied commands and then exit" :default nil]
-          ["-v" "--version" "Print the version string" :default false :flag true]
-          ["-h" "--help" "Display this help dialog" :default false :flag true]
-          ["-c" "--config CONFIG-FILE" "Path to a config file to use (edn format)" :default nil])]
+         args
+         ["-e" "--execute CODE" "Execute the supplied commands and then exit" :default nil]
+         ["-v" "--version" "Print the version string" :default false :flag true]
+         ["-h" "--help" "Display this help dialog" :default false :flag true]
+         ["-c" "--config CONFIG-FILE" "Path to a config file to use (edn format)" :default nil])]
     (cond
       (:help flags) (println banner)
       (:execute flags) (and (process-line (new-state '()) (:execute flags)) nil)
       (:version flags) (print-version)
       :else (main-loop
-              (merge
-                (get-config (:config flags))
-                defaults)))))
+             (merge
+              (get-config (:config flags))
+              defaults)))))
