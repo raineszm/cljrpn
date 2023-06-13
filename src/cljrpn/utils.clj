@@ -13,7 +13,7 @@
   "Used to build a map of data specified as a list of vectors. builder is applied to each spec vector in order to produce the resultant entries."
   [builder & specs]
   `(apply hash-map
-    (mapcat #(apply ~builder %) (list ~@specs))))
+          (mapcat #(apply ~builder %) (list ~@specs))))
 
 (defn effect
   "Formats a stack effect for an operation"

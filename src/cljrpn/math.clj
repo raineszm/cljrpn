@@ -19,25 +19,24 @@
       (recur (dec n) (* acc n)))))
 
 (defn mean
-  "Calculated the arithmetic mean of _args"
+  "Calculated the arithmetic mean of _args_"
   [& args]
   (let [n (count args)]
-    (if (pos? n)
+    (when (pos? n)
       (/ (apply + args) n))))
 
 (defn variance
   "Computes the variance of _args_"
   [& args]
   (let [n (count args)]
-    (if (pos? n)
+    (when (pos? n)
       (/ (apply + (map #(* % %) args)) n))))
 
 (defn stddev
   "Returns the standard deviation of _args_"
   [& args]
-  (if-let [s2 (apply variance args)]
+  (when-let [s2 (apply variance args)]
     (math/sqrt s2)))
-
 
 (defn binom
   "Returns the binomial coefficent of (m n). Also known as \"m C n\" or \"m choose n\""

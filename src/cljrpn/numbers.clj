@@ -10,7 +10,7 @@
 (defn process-num
   "Parses a number and pushes it to the stack"
   [state tok]
-  (pushf state (Float/parseFloat tok)))
+  (pushf state (parse-double tok)))
 
 (defn binary?
   "Determines if the string _tok_ represents a binary number"
