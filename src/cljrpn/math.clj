@@ -12,11 +12,7 @@
   "Return the factorial of n"
   [n]
   {:pre [(lax-integer? n) (not (neg? n))]}
-  (loop [n n
-         acc 1]
-    (if (<= n 1)
-      acc
-      (recur (dec n) (* acc n)))))
+  (reduce * (range 1 (inc n))))
 
 (defn mean
   "Calculated the arithmetic mean of _args_"
@@ -44,8 +40,5 @@
   (let [m-n (- m n)
         greater (max n m-n)
         lesser (max (min n m-n) 1)]
-    (/ (loop [m m
-              acc 1]
-         (if (> m greater)
-           (recur (dec m) (* acc m))
-           acc)) (factorial lesser))))
+    (/ (reduce * (range (inc greater) (inc m)))
+       (factorial lesser))))
