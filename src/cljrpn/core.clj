@@ -6,7 +6,7 @@
             [cljrpn.options :refer [get-config defaults]]
             [cljrpn.state :refer [new-state stack-size top]]
             [clojure.string :as s]
-            [clojure.tools.cli :refer :all])
+            [clojure.tools.cli :refer [cli]])
   (:gen-class))
 
 (def cljrpn-version
@@ -26,14 +26,15 @@
     `(fn [~state-var string#]
        ;iteratively replace the given patterns in the string by the result
        ;of running the corresponding function on the state object
-       (-> string# ~@(map
-                      (fn [[pat f]]
-                         ;replace each pattern 'pat' in the list
-                         ;with the result of calling f on the
-                         ;state var
-                        `(s/replace ~pat (str (~f ~state-var))))
-                       ;for each pair in the list substitutions
-                      subst)))))
+       (-> string#
+           ~@(map
+              (fn [[pat f]]
+                ;replace each pattern 'pat' in the list
+                ;with the result of calling f on the
+                ;state var
+                `(s/replace ~pat (str (~f ~state-var))))
+                ;for each pair in the list substitutions
+              subst)))))
 
 (def fill-in
   (filter-proc
@@ -69,15 +70,11 @@
 (defn process-line
   "Handle one line of input from the user. Input is split on white space and each \"word\" is then processed as a token."
   [state line]
-  (loop [state state
-         tokens (s/split line #"\s+")]
-    (if (empty? tokens)
-      ; When we reach the end of the line
-      ; trigger any dangling modifiers
-      (trigger-mod state)
-      (recur
-       (process-token state (first tokens))
-       (rest tokens)))))
+  (trigger-mod ; handle any dangling modifiers
+   (reduce
+    process-token
+    state
+    (s/split line #"\s+"))))
 
 (defn- greeting
   "Display the startup header."
@@ -89,16 +86,13 @@
   [options]
   (let [prompt (:prompt options)]
     (greeting)
-    (loop [main-state (new-state '())
-           line (get-line main-state prompt)]
-      (when line
-        (let [new-state (process-line main-state line)]
-          (recur new-state
-                 (get-line new-state prompt))))))
+    (loop [main-state (new-state '())]
+      (when-let [line (get-line main-state prompt)]
+        (recur (process-line main-state line)))))
   (println "Exiting..."))
 
 (defn -main [& args]
-  (let [[flags args banner]
+  (let [[flags _ banner]
         ; Parse our command line arguments
         (cli
          args
